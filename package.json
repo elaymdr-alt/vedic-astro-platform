@@ -1,0 +1,12 @@
+{
+  "name": "vedic-astro-platform",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "install": "npm --prefix frontend install"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.18.4"
+  }
+}

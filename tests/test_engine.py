@@ -1,10 +1,12 @@
 """Engine tests (TEST-engine): whole-sign, nakshatra borders, dasha, navamsa."""
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 
 from engine.chart import compute_chart
 from engine.d9 import navamsa_of
 from engine.dasha import vimshottari
-from engine.ephemeris import ephemeris_flag
+from engine.ephemeris import ephemeris_flag, configure
 from engine.nakshatra import nakshatra_of
 
 
@@ -50,3 +52,31 @@ def test_chart_whole_sign_houses():
     rahu = next(p for p in c["planets"] if p["name"] == "Rahu")
     ketu = next(p for p in c["planets"] if p["name"] == "Ketu")
     assert abs(((rahu["longitude"] + 180.0) % 360.0) - ketu["longitude"]) < 1e-6
+
+
+def test_concurrent_chart_computations():
+    """P06-T06: parallel chart requests must not corrupt global ephemeris state."""
+    configure()  # reset global once
+
+    results = []
+    errors = []
+
+    def compute(i: int):
+        try:
+            c = compute_chart(2024, 3, 20, 12.0 + i * 0.1, 3.5, 35.6892, 51.3890)
+            results.append(c)
+        except Exception as exc:
+            errors.append(str(exc))
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(compute, i) for i in range(20)]
+        for f in as_completed(futures):
+            f.result()  # propagate any exception
+
+    assert not errors, f"concurrent failures: {errors}"
+    assert len(results) == 20
+    # Every result must have consistent flag (no half-configured state)
+    flags = {r["ephemeris_flag"] for r in results}
+    assert len(flags) == 1, f"mixed ephemeris_flag across concurrent runs: {flags}"
+    # All ascendants must be valid (no None due to race condition)
+    assert all(r["ascendant"] is not None for r in results)

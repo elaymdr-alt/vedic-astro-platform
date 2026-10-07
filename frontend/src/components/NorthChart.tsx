@@ -1,45 +1,26 @@
 import type { ChartResult } from '../api';
 import { PLANET_FA } from '../api';
 
-/** North-Indian diamond chart: 12 houses as fixed diamonds, signs rotate by ascendant. */
-export default function NorthChart({ chart }: { chart: ChartResult }) {
+export type ChartMode = 'D1' | 'D9';
+
+/** North-Indian diamond chart: houses fixed, signs rotate by ascendant.
+ *  D9 (Navamsa) mode re-maps signs/houses from the D9 ascendant (P09-T02-M3). */
+export default function NorthChart({ chart, mode = 'D1' }: { chart: ChartResult; mode?: ChartMode }) {
+  const ascChart = chart.ascendant;
+  if (!ascChart) return null; // unknown birth time: no time-based chart (P05)
+
   const S = 480;
   const c = S / 2;
-  const q = S / 4; // quarter
-  // 12 diamond centers in fixed house positions (house 1 = top center diamond)
-  // Layout coordinates for house i (1..12) centers:
-  const centers: [number, number][] = [
-    [c, q / 2 + 20],          // 1 top
-    [q / 2 - 10, q / 2 + 10], // 2 top-left edge
-    [60, 60],                 // placeholder replaced below
-    [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-  ];
-  void centers;
-  const asc = chart.ascendant.sign_index;
-  // house -> sign mapping (whole sign)
+
+  const asc = mode === 'D9' ? ascChart.d9_sign_index : ascChart.sign_index;
+  const signOf = (p: { sign_index: number; d9_sign_index: number }) =>
+    mode === 'D9' ? p.d9_sign_index : p.sign_index;
+  // house -> sign mapping (whole sign; D9 houses come from the D9 ascendant)
   const houseSign = (h: number) => (asc + h - 1) % 12;
   const planetsIn = (h: number) =>
-    chart.planets.filter((p) => p.house === h);
+    chart.planets.filter((p) => (signOf(p) - asc + 12) % 12 + 1 === h);
 
   const signFa = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله', 'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
-
-  // Diamond polygons for 12 houses (viewBox 0 0 480 480)
-  // Standard north-indian chart geometry
-  const polys: string[] = [
-    `${c},${c - 10} ${c + 110},${c - 120} ${c},${c - 230} ${c - 110},${c - 120}`, // H1 top diamond
-    `${c - 120},${c - 240} ${c - 10},${c - 240} ${c - 120},${c - 130}`,           // H2
-    `${c - 240},${c - 240} ${c - 130},${c - 240} ${c - 240},${c - 130}`,          // H3 corner
-    `${c - 240},${c - 120} ${c - 240},${c - 10} ${c - 130},${c - 120}`,           // H4
-    `${c - 230},${c} ${c - 120},${c + 110} ${c - 120},${c - 110}`,                // H5
-    `${c - 110},${c + 120} ${c},${c + 230} ${c},${c + 10} `,                      // H6 (left-bottom of center)
-    `${c},${c + 10} ${c},${c + 230} ${c - 110},${c + 120}`,                       // H7 bottom diamond
-    `${c + 110},${c + 120} ${c},${c + 230} ${c},${c + 10}`,                       // placeholder
-    `${c + 230},${c} ${c + 120},${c - 110} ${c + 120},${c + 110}`,                // placeholder
-    `${c + 240},${c - 120} ${c + 240},${c - 10} ${c + 130},${c - 120}`,           // placeholder
-    `${c + 240},${c - 240} ${c + 130},${c - 240} ${c + 240},${c - 130}`,          // placeholder
-    `${c + 120},${c - 240} ${c + 10},${c - 240} ${c + 120},${c - 130}`,           // placeholder
-  ];
-  void polys;
 
   // Simpler robust approach: draw outer square + diagonals + inner diamond (classic template),
   // then place house content by fixed label anchors.
@@ -59,7 +40,8 @@ export default function NorthChart({ chart }: { chart: ChartResult }) {
   ];
 
   return (
-    <svg viewBox={`0 0 ${S} ${S}`} className="chart" role="img" aria-label="چارت شمالی">
+    <svg viewBox={`0 0 ${S} ${S}`} className="chart" role="img"
+         aria-label={`چارت شمالی ${mode === 'D9' ? 'ناوامشا (D9)' : 'دشانه (D1)'}`}>
       <rect x={10} y={10} width={S - 20} height={S - 20} className="chart-box" />
       {/* diagonals */}
       <line x1={10} y1={10} x2={S - 10} y2={S - 10} className="chart-line" />
@@ -69,6 +51,7 @@ export default function NorthChart({ chart }: { chart: ChartResult }) {
         points={`${c},110 ${370},${c} ${c},${370} 110,${c}`}
         className="chart-line chart-fill-none"
       />
+      <text x={S - 16} y={26} textAnchor="end" className="chart-sign">{mode}</text>
       {anchors.map(([x, y], i) => {
         const h = i + 1;
         const s = houseSign(h);

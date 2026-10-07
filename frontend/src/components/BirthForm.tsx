@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { searchCities } from '../api';
 
 export interface BirthState {
+  calendar: 'jalali' | 'gregorian';
   year: number; month: number; day: number;
   hour: number; minute: number;
   lat: number; lon: number; tz_offset: number;
@@ -9,6 +10,7 @@ export interface BirthState {
 }
 
 const DEFAULTS: BirthState = {
+  calendar: 'jalali',
   year: 1375, month: 5, day: 12, hour: 10, minute: 30,
   lat: 35.6892, lon: 51.389, tz_offset: 3.5, cityLabel: 'تهران',
 };

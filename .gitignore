@@ -1,0 +1,42 @@
+# Byte-compiled / cache files (Python)
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.cpython-*.pyc
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Frontend / Node.js
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & Databases
+*.log
+*.sqlite
+*.sqlite3

@@ -1,9 +1,37 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>طالع‌بینی ودیک</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="طالع‌بینی ودیک — محاسبه دقیق چارت تولد با آیانامشای لاهیری، خانه‌های Whole Sign و ناوامشا (D9)" />
+    <meta name="theme-color" content="#05040d" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>طالع‌بینی ودیک — چارت تولد دقیق</title>
+
+    <script>
+      // Prevent theme flash: resolve the theme before React hydrates.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var theme = stored && stored !== 'system' ? stored : prefersDark ? 'dark' : 'light'
+          var el = document.documentElement
+          el.classList.remove('light', 'dark')
+          el.classList.add(theme)
+          el.style.colorScheme = theme
+        } catch (e) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

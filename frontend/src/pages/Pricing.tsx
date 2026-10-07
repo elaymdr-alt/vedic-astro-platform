@@ -60,11 +60,11 @@ const plans = [
 
 export default function Pricing() {
   return (
-    <div className="min-h-screen bg-background py-16 px-4" dir="rtl">
+    <div className=" bg-background py-16 px-4" dir="rtl">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 bg-gold-50 text-gold-600">
+          <Badge variant="secondary" className="mb-4 bg-gold-500/15 text-gold-200 ring-1 ring-gold-400/30">
             بسته‌های اشتراکی
           </Badge>
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl vedic-text-gradient mb-4">
@@ -92,7 +92,7 @@ export default function Pricing() {
                 </div>
               )}
               <CardHeader className="text-center pt-8">
-                <div className="mx-auto w-14 h-14 rounded-full bg-brand-50 flex items-center justify-center mb-4">
+                <div className="mx-auto w-14 h-14 rounded-full bg-brand-500/15 ring-1 ring-brand-400/25 flex items-center justify-center mb-4">
                   <plan.icon className="h-7 w-7 text-brand-600" />
                 </div>
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>

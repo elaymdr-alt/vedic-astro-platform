@@ -21,7 +21,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden" dir="rtl">
+    <div className=" flex items-center justify-center bg-background p-4 relative overflow-hidden" dir="rtl">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -30,7 +30,7 @@ export default function Auth() {
 
       <Card className="w-full max-w-md vedic-card vedic-glow relative z-10">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 rounded-full bg-brand-50 flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-brand-500/15 ring-1 ring-brand-400/25 flex items-center justify-center">
             <Star className="h-8 w-8 text-brand-600" />
           </div>
           <CardTitle className="text-2xl vedic-text-gradient">طالع‌بینی ودیک</CardTitle>

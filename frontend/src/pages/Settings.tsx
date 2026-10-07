@@ -28,7 +28,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 max-w-6xl mx-auto" dir="rtl">
+    <div className=" bg-background p-6 max-w-6xl mx-auto" dir="rtl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold vedic-text-gradient mb-2">تنظیمات</h1>
         <p className="text-muted-foreground">مدیریت پروفایل، ظاهر و تعداد اشتراک</p>
@@ -61,7 +61,7 @@ export default function Settings() {
               <CardContent className="flex flex-col items-center pt-6">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src="" />
-                  <AvatarFallback className="text-2xl bg-brand-100 text-brand-700">عل</AvatarFallback>
+                  <AvatarFallback className="text-2xl bg-brand-500/20 text-brand-200">عل</AvatarFallback>
                 </Avatar>
                 <CardTitle className="mt-4">علی احمدی</CardTitle>
                 <CardDescription>عضو از سال 1402</CardDescription>
@@ -162,7 +162,7 @@ export default function Settings() {
                       key={theme}
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
                         appearance === theme
-                          ? "border-brand-500 bg-brand-50"
+                          ? "border-brand-400 bg-brand-500/15"
                           : "border-border hover:border-brand-300"
                       }`}
                       onClick={() => setAppearance(theme)}

@@ -110,16 +110,21 @@ import pytest  # noqa: E402
 from engine import ephemeris as eph  # noqa: E402
 
 
+NO_FILES = "__no_such_ephemeris_dir__"
+
+
 def test_flag_reflects_what_the_library_returned():
-    eph.configure(strict=False)
-    eph.body_longitude("Sun", eph.julday(2000, 1, 1, 12.0))
-    # No EPHE_PATH in the test env: the library really used Moshier.
-    assert eph.ephemeris_flag() == "moshier"
+    eph.configure(ephe_path=NO_FILES, strict=False)  # force "no Swiss files"
+    try:
+        eph.body_longitude("Sun", eph.julday(2000, 1, 1, 12.0))
+        assert eph.ephemeris_flag() == "moshier"
+    finally:
+        eph.configure(strict=False)
 
 
 def test_strict_mode_refuses_silent_fallback():
     try:
-        eph.configure(strict=True)
+        eph.configure(ephe_path=NO_FILES, strict=True)
         with pytest.raises(eph.EphemerisUnavailable):
             eph.body_longitude("Moon", eph.julday(2000, 1, 1, 12.0))
     finally:
@@ -151,3 +156,20 @@ def test_j2000_positions_match_published_reference(name, tropical):
 
 def test_lahiri_ayanamsa_at_j2000():
     assert abs(eph.ayanamsa_value(eph.julday(2000, 1, 1, 12.0)) - 23.857) < 0.01
+
+
+def test_swiss_files_are_used_and_agree_with_reference_when_present():
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1] / "knowledge" / "ephe"
+    if not (root / "sepl_18.se1").exists():
+        pytest.skip("Swiss ephemeris files not installed (knowledge/ephe)")
+    try:
+        assert eph.configure(ephe_path=str(root), strict=True) == str(root)
+        jd = eph.julday(2000, 1, 1, 12.0)
+        moon = eph.body_longitude("Moon", jd).longitude
+        assert eph.ephemeris_flag() == "swiss"
+        tropical = 223.3238  # published J2000 geocentric Moon
+        expected = (tropical - eph.ayanamsa_value(jd)) % 360.0
+        assert abs(((moon - expected + 180) % 360) - 180) < 0.05
+    finally:
+        eph.configure(strict=False)

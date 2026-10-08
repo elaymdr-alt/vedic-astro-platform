@@ -43,3 +43,5 @@ desktop.ini
 .playwright-mcp/
 *.db
 knowledge/books/
+
+knowledge/ephe/

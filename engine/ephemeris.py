@@ -21,6 +21,10 @@ from dataclasses import dataclass
 
 import swisseph as swe
 
+from .envfile import load_dotenv
+
+load_dotenv()  # EPHE_PATH / EPHE_STRICT may live in the git-ignored .env
+
 AYANAMSA = swe.SIDM_LAHIRI
 FLAGS = swe.FLG_SIDEREAL | swe.FLG_SWIEPH | swe.FLG_SPEED
 

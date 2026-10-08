@@ -19,11 +19,12 @@ from engine.ephemeris import EphemerisUnavailable  # noqa: E402
 from engine.synastry import synastry as synastry_of  # noqa: E402
 from engine.timezone import TimezoneError, local_to_utc  # noqa: E402
 from engine.transit import transit_scan  # noqa: E402
+from engine import rectify as rect  # noqa: E402
 from backend.cities import search_cities  # noqa: E402
 from backend.database import init_db  # noqa: E402
 from backend.routes import router as api_router  # noqa: E402
 from backend.schemas import (  # noqa: E402
-    BirthInput, CalendarConvertIn, SynastryInput, TimezoneConvertIn,
+    BirthInput, CalendarConvertIn, RectifyIn, SynastryInput, TimezoneConvertIn,
     TransitScanInput,
 )
 
@@ -168,3 +169,65 @@ def transit_scan_endpoint(body: TransitScanInput) -> dict:
         # Naive timestamps are interpreted as UTC (documented in the schema).
         start = start.replace(tzinfo=timezone.utc)
     return {"scan": transit_scan(natal, start, body.days)}
+
+
+def _to_gregorian(calendar: str, y: int, m: int, d: int) -> tuple[int, int, int]:
+    if calendar == "jalali":
+        if not is_valid_jalali(y, m, d):
+            raise HTTPException(status_code=422, detail={
+                "code": "INVALID_JALALI", "message": "تاریخ شمسی نامعتبر است"})
+        return jalali_to_gregorian(y, m, d)
+    return y, m, d
+
+
+def _hhmm_to_min(s: str) -> int:
+    h, m = s.split(":")
+    if not (0 <= int(h) <= 23 and 0 <= int(m) <= 59):
+        raise HTTPException(status_code=422, detail={
+            "code": "INVALID_TIME", "message": "ساعت نامعتبر است"})
+    return int(h) * 60 + int(m)
+
+
+@app.get("/rectify/event-types")
+def rectify_event_types() -> dict:
+    return {"items": [{"type": k, "label_fa": v[2], "houses": sorted(v[0])}
+                      for k, v in rect.EVENT_TYPES.items()]}
+
+
+@app.post("/rectify")
+def rectify_birth_time(body: RectifyIn) -> dict:
+    """Probabilistic birth-time estimate from life events (never a single certain minute)."""
+    from datetime import date as _date
+    gy, gm, gd = _to_gregorian(body.calendar, body.year, body.month, body.day)
+    tz_offset = body.tz_offset
+    if body.tz:
+        try:  # offset at local noon of the birth date (DST-aware)
+            tz_offset = local_to_utc(gy, gm, gd, 12, 0, body.tz, fold=0).utc_offset_hours
+        except TimezoneError as exc:
+            raise HTTPException(status_code=422, detail={
+                "code": exc.code, "message": exc.message, "details": exc.details or {}})
+    events = []
+    for e in body.events:
+        if e.type not in rect.EVENT_TYPES:
+            raise HTTPException(status_code=422, detail={
+                "code": "UNKNOWN_EVENT_TYPE", "message": f"نوع رویداد ناشناخته: {e.type}"})
+        ey, em, ed = _to_gregorian(e.calendar, e.year, e.month, e.day if e.precision == "day" else 1)
+        try:
+            events.append(rect.Event(e.type, _date(ey, em, ed), e.precision))
+        except ValueError:
+            raise HTTPException(status_code=422, detail={
+                "code": "INVALID_DATE", "message": "تاریخ رویداد نامعتبر است"})
+    w0, w1 = _hhmm_to_min(body.window_from), _hhmm_to_min(body.window_to)
+    if w1 < w0:
+        raise HTTPException(status_code=422, detail={
+            "code": "INVALID_WINDOW", "message": "پایان بازه باید بعد از شروع باشد"})
+    try:
+        return rect.rectify(
+            gy, gm, gd, tz_offset, body.lat, body.lon, events, window=(w0, w1),
+            step_min=body.step_minutes,
+            prior_center_min=_hhmm_to_min(body.approx_time) if body.approx_time else None,
+            prior_sigma_min=body.approx_sigma_min, permutations=body.permutations,
+        )
+    except EphemerisUnavailable as exc:
+        raise HTTPException(status_code=503, detail={
+            "code": "EPHEMERIS_UNAVAILABLE", "message": str(exc)})

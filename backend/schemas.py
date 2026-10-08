@@ -101,3 +101,32 @@ class ProfileOut(ProfileIn):
     owner_id: int
 
     model_config = {"from_attributes": True}
+
+
+class RectifyEventIn(BaseModel):
+    type: str
+    calendar: Literal["jalali", "gregorian"] = "jalali"
+    year: int = Field(..., ge=1200, le=2100)
+    month: int = Field(1, ge=1, le=12)
+    day: int = Field(1, ge=1, le=31)
+    precision: Literal["day", "month", "year"] = "day"
+
+
+class RectifyIn(BaseModel):
+    """Estimate the birth time from life events (set-valued, never a single minute)."""
+    calendar: Literal["jalali", "gregorian"] = "jalali"
+    year: int = Field(..., ge=1200, le=2100)
+    month: int = Field(..., ge=1, le=12)
+    day: int = Field(..., ge=1, le=31)
+    tz: str | None = None
+    tz_offset: float = Field(3.5, ge=-12, le=14)
+    lat: float = Field(..., ge=-90, le=90)
+    lon: float = Field(..., ge=-180, le=180)
+    window_from: str = Field("00:00", pattern=r"^\d{2}:\d{2}$")
+    window_to: str = Field("23:59", pattern=r"^\d{2}:\d{2}$")
+    approx_time: str | None = Field(None, pattern=r"^\d{2}:\d{2}$",
+                                    description="best remembered time; used as a soft prior")
+    approx_sigma_min: int = Field(90, ge=5, le=360)
+    events: list[RectifyEventIn] = Field(..., min_length=1, max_length=14)
+    step_minutes: int = Field(4, ge=1, le=15)
+    permutations: int = Field(60, ge=0, le=200)

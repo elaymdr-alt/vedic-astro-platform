@@ -39,5 +39,6 @@ desktop.ini
 # Logs & Databases
 *.log
 *.sqlite
-*.sqlite3.playwright-mcp/
+*.sqlite3
+.playwright-mcp/
 *.db

@@ -128,7 +128,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   cn(
                     'group relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'text-brand-200'
+                      ? 'text-brand-700 dark:text-brand-200'
                       : 'text-muted-foreground hover:bg-white/[0.05] hover:text-foreground',
                   )
                 }

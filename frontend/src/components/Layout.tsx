@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
+  Brain,
   BookOpen,
   CalendarDays,
   Clock,
@@ -35,7 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/reading', label: 'تفسیر', icon: BookOpen },
   { to: '/rectify', label: 'ساعت تولد', icon: Clock },
   { to: '/chat', label: 'گفت‌وگو', icon: MessageCircle },
-  { to: '/dashboard', label: 'داشبورد', icon: LayoutDashboard },
+  { to: '/psyche', label: 'روان‌شناسی', icon: Brain },
 ]
 
 function ThemeToggle() {

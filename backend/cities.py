@@ -1,25 +1,67 @@
-"""Small city dataset (Iran) + search — P05-T01 subset (PostGIS stub later)."""
+"""World city search (GeoNames cities15000, ~34k cities, Persian names where available).
+
+Each result carries the IANA zone (``tz``); the real historical UTC offset is
+derived from it by the chart endpoints. ``tz_offset`` here is only today's
+offset, for display.
+"""
 from __future__ import annotations
 
-CITIES = [
-    {"name_fa": "تهران", "name_en": "Tehran", "lat": 35.6892, "lon": 51.3890, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "مشهد", "name_en": "Mashhad", "lat": 36.2605, "lon": 59.6168, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "اصفهان", "name_en": "Isfahan", "lat": 32.6546, "lon": 51.6680, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "شیراز", "name_en": "Shiraz", "lat": 29.5918, "lon": 52.5837, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "تبریز", "name_en": "Tabriz", "lat": 38.0962, "lon": 46.2738, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "کرج", "name_en": "Karaj", "lat": 35.8400, "lon": 50.9391, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "قم", "name_en": "Qom", "lat": 34.6399, "lon": 50.8759, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "اهواز", "name_en": "Ahvaz", "lat": 31.3204, "lon": 48.6693, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "یزد", "name_en": "Yazd", "lat": 31.8974, "lon": 54.3569, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "کرمان", "name_en": "Kerman", "lat": 30.2839, "lon": 57.0679, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "رشت", "name_en": "Rasht", "lat": 37.2808, "lon": 49.5832, "tz": "Asia/Tehran", "tz_offset": 3.5},
-    {"name_fa": "ساری", "name_en": "Sari", "lat": 36.5633, "lon": 53.0601, "tz": "Asia/Tehran", "tz_offset": 3.5},
-]
+import gzip
+import json
+from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+from engine.timezone import resolve_timezone  # noqa: F401  (validates tz names at build time)
+
+from backend.ai.textutil import normalize
+
+DATA = Path(__file__).resolve().parents[1] / "knowledge" / "cities" / "cities.json.gz"
+
+
+@lru_cache(maxsize=1)
+def _load() -> list[dict]:
+    with gzip.open(DATA, "rt", encoding="utf-8") as fh:
+        rows = json.load(fh)
+    for r in rows:
+        r["_en"] = r["n"].lower()
+        r["_fa"] = [normalize(x) for x in r["f"]]
+    return rows
+
+
+def _offset_now(tz: str) -> float:
+    try:
+        return datetime.now(timezone.utc).astimezone(ZoneInfo(tz)).utcoffset().total_seconds() / 3600.0
+    except Exception:  # noqa: BLE001 — unknown zone: caller still gets coordinates
+        return 0.0
+
+
+def _view(r: dict) -> dict:
+    return {"name_fa": r["f"][0] if r["f"] else r["n"], "name_en": r["n"], "country": r["c"],
+            "lat": r["lat"], "lon": r["lon"], "tz": r["tz"], "tz_offset": _offset_now(r["tz"]),
+            "population": r["p"]}
 
 
 def search_cities(q: str, limit: int = 8) -> list[dict]:
-    q = (q or "").strip().lower()
-    if not q:
-        return CITIES[:limit]
-    out = [c for c in CITIES if q in c["name_fa"] or q in c["name_en"].lower()]
-    return out[:limit]
+    rows = _load()
+    q = (q or "").strip()
+    if not q:  # default suggestions: the biggest Iranian cities
+        top = sorted((r for r in rows if r["c"] == "IR"), key=lambda r: -r["p"])[:limit]
+        return [_view(r) for r in top]
+    nq = normalize(q)
+    scored: list[tuple[float, dict]] = []
+    for r in rows:
+        names = [r["_en"], *r["_fa"]]
+        best = 0
+        for n in names:
+            if n == nq:
+                best = max(best, 3)
+            elif n.startswith(nq):
+                best = max(best, 2)
+            elif len(nq) >= 3 and nq in n:
+                best = max(best, 1)
+        if best:
+            scored.append((best * 1e9 + r["p"] + (5e7 if r["c"] == "IR" else 0), r))
+    scored.sort(key=lambda x: -x[0])
+    return [_view(r) for _, r in scored[:limit]]

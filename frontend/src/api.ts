@@ -38,12 +38,14 @@ export const PLANET_FA: Record<string, string> = {
 export const SIGN_FA = ['حمل', 'ثور', 'جوزا', 'سرطان', 'اسد', 'سنبله',
   'میزان', 'عقرب', 'قوس', 'جدی', 'دلو', 'حوت'];
 
+import { friendlyError } from './lib/net';
+
 const API = '/api';
 
 async function post<T>(path: string, payload: unknown): Promise<T> {
   const r = await fetch(`${API}${path}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
-  });
+  }).catch((e) => { throw new Error(friendlyError(e)); });
   if (!r.ok) {
     const err = await r.json().catch(() => ({}));
     throw new Error(err?.detail?.message ?? (typeof err?.detail === 'string' ? err.detail : `خطای سرور (${r.status})`));

@@ -64,6 +64,14 @@
     --glow-gold: 350 100% 70%;
   }
 
+  /* scale vars used by SVG charts (hsl triplets matching the Tailwind brand palette) */
+  :root, .dark {
+    --brand-400: 352 82% 62%;
+    --brand-500: 352 73% 50%;
+    --gold-400: 36 92% 46%;
+    --gold-500: 32 95% 40%;
+  }
+
   * {
     @apply border-border;
     box-sizing: border-box;

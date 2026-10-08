@@ -4,6 +4,7 @@ import {
 } from 'lucide-react'
 import BirthForm, { loadSavedBirth, type BirthState } from '@/components/BirthForm'
 import { cn } from '@/lib/utils'
+import { friendlyError } from '@/lib/net'
 
 type StyleId = 'auto' | 'hope' | 'love' | 'nudge' | 'guide' | 'calm' | 'comfort' | 'heart'
 interface Source { ref: string; title: string; source: string; page: number | null; kind: string }
@@ -145,7 +146,7 @@ export default function Chat() {
       }
     } catch (e) {
       if ((e as Error).name !== 'AbortError') {
-        patch((m) => ({ ...m, content: m.content || (e instanceof Error ? e.message : 'خطای ناشناخته'), error: true }))
+        patch((m) => ({ ...m, content: m.content || friendlyError(e), error: true }))
       }
     } finally {
       setBusy(false)

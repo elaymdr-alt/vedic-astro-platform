@@ -1,4 +1,6 @@
 /** Token storage + authenticated fetch. Storage may be blocked: everything degrades to "logged out". */
+import { friendlyError } from './net'
+
 const KEY = 'ab_token'
 const listeners = new Set<() => void>()
 
@@ -40,7 +42,7 @@ export async function authFetch(path: string, init: RequestInit = {}): Promise<R
 
 export async function login(identifier: string, password: string): Promise<void> {
   const body = new URLSearchParams({ username: identifier, password })
-  const r = await fetch('/api/auth/token', { method: 'POST', body })
+  const r = await fetch('/api/auth/token', { method: 'POST', body }).catch((e) => { throw new Error(friendlyError(e)) })
   if (!r.ok) throw new Error(await parseError(r))
   setToken((await r.json()).access_token)
 }
@@ -49,7 +51,7 @@ export async function register(username: string, email: string, password: string
   const r = await fetch('/api/auth/register', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, email, password }),
-  })
+  }).catch((e) => { throw new Error(friendlyError(e)) })
   if (!r.ok) throw new Error(await parseError(r))
   await login(username, password)
 }

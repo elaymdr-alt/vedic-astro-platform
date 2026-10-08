@@ -14,6 +14,7 @@ from .constants import PLANETS, SIGNS_EN, SIGNS_FA, SIGN_LORDS
 from .nakshatra import nakshatra_of
 from .d9 import navamsa_of
 from .dasha import vimshottari
+from .vargas import vargas_of
 
 TIME_SENSITIVE_FIELDS = ["ascendant", "houses_whole_sign", "dasha", "moon_nakshatra"]
 
@@ -49,6 +50,7 @@ def planet_positions(jd_ut: float, node: str = "mean") -> tuple[list[dict[str, A
             "retrograde": pos.retrograde, "speed": round(pos.speed_lon, 4),
             "d9_sign_index": d9_sign, "d9_sign": SIGNS_EN[d9_sign],
             "d9_longitude": d9["longitude"],
+            "vargas": vargas_of(round(pos.longitude, 4)),
         })
 
     # Ketu = Rahu + 180
@@ -64,6 +66,7 @@ def planet_positions(jd_ut: float, node: str = "mean") -> tuple[list[dict[str, A
         "retrograde": True, "speed": round(-rahu["speed"], 4),
         "d9_sign_index": kd9_sign, "d9_sign": SIGNS_EN[kd9_sign],
         "d9_longitude": k_d9["longitude"],
+        "vargas": vargas_of(ketu_lon),
     })
     return bodies, moon_lon
 
@@ -138,6 +141,7 @@ def compute_chart(
             "d9_sign_index": asc_d9["sign_index"],
             "d9_sign": SIGNS_EN[asc_d9["sign_index"]],
             "d9_longitude": asc_d9["longitude"],
+            "vargas": vargas_of(round(asc_lon, 4)),
         },
         "midheaven": {"longitude": round(mc_lon, 4), "sign_index": int(mc_lon // 30)},
         "planets": bodies,

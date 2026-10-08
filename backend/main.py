@@ -27,6 +27,7 @@ from backend.database import init_db  # noqa: E402
 from backend.routes import router as api_router  # noqa: E402
 from backend.chat_routes import router as chat_router  # noqa: E402
 from backend.reports import router as reports_router  # noqa: E402
+from backend.dreams import router as dreams_router  # noqa: E402
 from backend.schemas import (  # noqa: E402
     BirthInput, CalendarConvertIn, DailyIn, RectifyIn, SynastryInput, TimezoneConvertIn,
     TransitScanInput,
@@ -53,6 +54,7 @@ app.add_middleware(
 app.include_router(api_router)
 app.include_router(chat_router)
 app.include_router(reports_router)
+app.include_router(dreams_router)
 
 
 @app.get("/health")

@@ -19,7 +19,7 @@ def test_alembic_upgrade_creates_every_table(tmp_path):
                        capture_output=True, text=True)
     assert r.returncode == 0, r.stderr[-800:]
     names = {row[0] for row in sqlite3.connect(db).execute("select name from sqlite_master where type='table'")}
-    assert {"users", "birth_profiles", "profile_shares", "calculations", "reports"} <= names
+    assert {"users", "birth_profiles", "profile_shares", "calculations", "reports", "dream_entries"} <= names
     cols = {row[1] for row in sqlite3.connect(db).execute("pragma table_info(reports)")}
     assert {"result_json", "idempotency_key", "attempts"} <= cols
 

@@ -418,3 +418,14 @@
 @media (prefers-reduced-motion: reduce) {
   .chat-dots i, .chat-breath { animation: none; }
 }
+
+
+/* ---- Print / "Save as PDF": clean white pages, no chrome, readable Persian ---- */
+@media print {
+  header, nav, footer, .no-print, .vedic-aurora, .vedic-grid-overlay, canvas, svg.light-only, button { display: none !important; }
+  body, .chat-theme { background: #fff !important; color: #000 !important; }
+  .glass, .vedic-card, .chat-panel, .chat-bot { box-shadow: none !important; background: #fff !important; border: 1px solid #ccc !important; backdrop-filter: none !important; }
+  section, article { break-inside: avoid; }
+  a { color: inherit !important; text-decoration: none !important; }
+  @page { size: A4; margin: 14mm; }
+}

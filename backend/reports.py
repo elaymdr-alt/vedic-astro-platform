@@ -178,6 +178,8 @@ def export_my_data(user: User = Depends(get_current_user), db: Session = Depends
     profiles = db.query(BirthProfile).filter(BirthProfile.owner_id == user.id).all()
     return {
         "user": {"id": user.id, "username": user.username, "email": user.email, "role": user.role},
+        "dreams": [{"id": d.id, "title": d.title, "text": d.text, "mood": d.mood,
+                    "reflection": d.reflection} for d in user.dreams],
         "profiles": [{"id": p.id, "name": p.display_name, "calendar": p.calendar, "year": p.year,
                       "month": p.month, "day": p.day, "hour": p.hour, "minute": p.minute,
                       "tz_offset": p.tz_offset, "lat": p.lat, "lon": p.lon,

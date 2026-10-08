@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { BookOpen, Brain, CheckCircle2, Loader2, Search, Sparkles } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { BookOpen, Brain, MoonStar, CheckCircle2, Loader2, Search, Sparkles } from 'lucide-react'
 import BirthForm, { loadSavedBirth, type BirthState } from '@/components/BirthForm'
 import { cn } from '@/lib/utils'
 
@@ -93,6 +94,9 @@ export default function Psyche() {
           </p>
         </header>
 
+        <Link to="/dreams" className="chat-panel flex items-center justify-center gap-2 rounded-2xl p-3 text-sm font-semibold text-[hsl(var(--primary))]">
+          <MoonStar className="h-4 w-4" aria-hidden="true" /> دفترچهٔ رؤیا و تأمل یونگی
+        </Link>
         {err && <div role="alert" className="rounded-2xl bg-white/80 p-3 text-center text-sm">{err}</div>}
 
         <section className="space-y-4" aria-labelledby="h-profile">

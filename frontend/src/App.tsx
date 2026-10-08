@@ -15,6 +15,7 @@ import Rectify from './pages/Rectify'
 import Today from './pages/Today'
 import Chat from './pages/Chat'
 import Psyche from './pages/Psyche'
+import Dreams from './pages/Dreams'
 import { computeChart, PLANET_FA, type ChartResult } from './api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -218,6 +219,7 @@ export default function App() {
         <Route path="/today" element={<Today />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/psyche" element={<Psyche />} />
+        <Route path="/dreams" element={<Dreams />} />
         <Route path="/rectify" element={<Rectify />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />

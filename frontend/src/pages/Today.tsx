@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AlertTriangle, CalendarDays, Clock, Loader2, Sparkles, Sun } from 'lucide-react'
+import { AlertTriangle, CalendarDays, Clock, Download, Loader2, Printer, Sparkles, Sun } from 'lucide-react'
 import BirthForm, { type BirthState, loadSavedBirth } from '@/components/BirthForm'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -55,6 +55,20 @@ export default function Today() {
     return () => { alive = false }
   }, [birth])
 
+  const downloadIcs = async () => {
+    if (!birth) return
+    const r = await fetch('/api/daily/calendar.ics', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ birth: { calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day,
+        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, lat: birth.lat, lon: birth.lon }, days: 30 }),
+    })
+    if (!r.ok) { setError('ساخت فایل تقویم انجام نشد'); return }
+    const url = URL.createObjectURL(await r.blob())
+    const a = document.createElement('a')
+    a.href = url; a.download = 'astrobinesh.ics'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (!birth || asking) {
     return (
       <div className="mx-auto max-w-xl px-4 py-10">
@@ -86,6 +100,8 @@ export default function Today() {
                   تارا: {data.personal.tara_bala.name_fa}
                 </Badge>
                 <Button size="sm" variant="ghost" onClick={() => setAsking(true)}>تغییر اطلاعات</Button>
+                <Button size="sm" variant="outline" onClick={downloadIcs}><Download className="ml-1 h-3.5 w-3.5" aria-hidden="true" /> افزودن به تقویم (ICS)</Button>
+                <Button size="sm" variant="outline" className="no-print" onClick={() => window.print()}><Printer className="ml-1 h-3.5 w-3.5" aria-hidden="true" /> چاپ / PDF</Button>
               </div>
               {data.limited && (
                 <p className="mt-3 flex items-center gap-2 text-xs text-amber-700">

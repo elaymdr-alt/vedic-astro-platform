@@ -33,6 +33,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     profiles = relationship("BirthProfile", back_populates="owner", cascade="all, delete-orphan")
+    dreams = relationship("DreamEntry", back_populates="owner", cascade="all, delete-orphan")
     shared_profiles = relationship(
         "ProfileShare", back_populates="shared_with_user", cascade="all, delete-orphan"
     )
@@ -113,3 +114,18 @@ class Report(Base):
     profile = relationship("BirthProfile", back_populates="reports")
 
     __table_args__ = (UniqueConstraint("profile_id", "idempotency_key", name="uq_report_idem"),)
+
+
+class DreamEntry(Base):
+    __tablename__ = "dream_entries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    title = Column(String(160), default="")
+    text = Column(Text, nullable=False)
+    mood = Column(String(30), default="")
+    reflection = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    reflected_at = Column(DateTime, nullable=True)
+
+    owner = relationship("User", back_populates="dreams")

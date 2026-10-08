@@ -134,6 +134,9 @@ function ReadingView({
               <Sparkles className="size-4" />
               تغییر اطلاعات تولد
             </button>
+            <Button size="lg" variant="outline" className="no-print" onClick={() => window.print()}>
+              دریافت PDF (چاپ)
+            </Button>
             <Button size="lg" variant="outline" asChild>
               <Link to="/" className="gap-2">
                 <ScrollText className="size-4" />

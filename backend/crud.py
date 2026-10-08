@@ -28,7 +28,7 @@ def create_user(db: Session, username: str, email: str, password: str, role: str
 
 
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter((User.username == username) | (User.email == username)).first()
     if not user or not bcrypt.checkpw(password.encode("utf-8"), user.hashed_password.encode("utf-8")):
         return None
     return user

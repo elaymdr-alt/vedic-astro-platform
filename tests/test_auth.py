@@ -74,3 +74,9 @@ def test_profile_crud_and_cross_user_isolation(client):
 def test_profiles_require_auth(client):
     assert client.get("/profiles").status_code == 401
     assert client.post("/profiles", json=PROFILE).status_code == 401
+
+
+def test_login_with_email_or_username(client):
+    signup(client, "ali")
+    by_email = client.post("/auth/token", data={"username": "ali@x.io", "password": "s3cretpass"})
+    assert by_email.status_code == 200 and by_email.json()["access_token"]

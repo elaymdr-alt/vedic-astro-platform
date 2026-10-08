@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { login, register } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,12 +14,23 @@ export default function Auth() {
   const [name, setName] = useState("")
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const nav = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const run = async (fn: () => Promise<void>) => {
     setLoading(true)
-    setTimeout(() => setLoading(false), 1500)
+    setError("")
+    try {
+      await fn()
+      nav("/dashboard")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطای ناشناخته")
+    } finally {
+      setLoading(false)
+    }
   }
+  const handleLogin = (e: React.FormEvent) => { e.preventDefault(); void run(() => login(email, password)) }
+  const handleRegister = (e: React.FormEvent) => { e.preventDefault(); void run(() => register(name, email, password)) }
 
   return (
     <div className=" flex items-center justify-center bg-background p-4 relative overflow-hidden" dir="rtl">
@@ -38,18 +50,19 @@ export default function Auth() {
           </CardTitle>
           <CardDescription>ورود به حساب خود یا ثبت‌نام</CardDescription>
         </CardHeader>
+        {error && <p role="alert" className="mx-6 mb-2 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
         <Tabs defaultValue="login">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">ورود</TabsTrigger>
             <TabsTrigger value="register">ثبت‌نام</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleLogin}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">ایمیل</Label>
+                  <Label htmlFor="email">ایمیل یا نام کاربری</Label>
                   <div className="relative">
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" required className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
+                    <Input id="email" type="text" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" required className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
                     <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-400" />
                   </div>
                 </div>
@@ -75,11 +88,11 @@ export default function Auth() {
             </form>
           </TabsContent>
           <TabsContent value="register">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleRegister}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">نام و نام خانوادگی</Label>
-                  <Input id="name" placeholder="نام و نام خانوادگی" required className="transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
+                  <Label htmlFor="name">نام کاربری (حداقل ۳ حرف)</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} minLength={3} maxLength={80} autoComplete="username" placeholder="نام کاربری" required className="transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="reg-email">ایمیل</Label>
@@ -88,7 +101,7 @@ export default function Auth() {
                 <div className="space-y-2">
                   <Label htmlFor="reg-password">رمز عبور</Label>
                   <div className="relative">
-                    <Input id="reg-password" type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
+                    <Input id="reg-password" type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="حداقل ۸ نویسه" minLength={8} autoComplete="new-password" required className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-brand-500" />
                     <Moon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-400" />
                     <button type="button" onClick={() => setShowPw(!showPw)} className="absolute left-10 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand-600 transition-colors">
                       {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

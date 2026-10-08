@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { searchCities } from '../api'
+import { authFetch, getToken, onAuthChange } from '../lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -129,6 +130,22 @@ export default function DashboardPage() {
   const [showResult, setShowResult] = useState(false)
   const [chartResult, setChartResult] = useState<any>(null)
 
+  // logged in: the server is the source of truth for saved profiles
+  const [token, setTok] = useState<string | null>(getToken())
+  useEffect(() => onAuthChange(() => setTok(getToken())), [])
+  useEffect(() => {
+    if (!token) return
+    authFetch('/profiles').then(async (r) => {
+      if (!r.ok) return
+      const rows: any[] = await r.json()
+      setProfiles(rows.map((p) => ({
+        id: String(p.id), createdAt: new Date().toISOString(),
+        birth: { year: p.year, month: p.month, day: p.day, hour: p.hour, minute: p.minute,
+                 lat: p.lat, lon: p.lon, tz_offset: p.tz_offset, cityLabel: p.display_name },
+      })))
+    }).catch(() => {})
+  }, [token])
+
   useEffect(() => {
     if (!citySearch.trim()) { setCities([]); return }
     const t = setTimeout(async () => {
@@ -149,8 +166,18 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error('خطا در محاسبه چارت')
       const data = await res.json()
       setChartResult(data.chart)
-      const profile: Profile = { id: Date.now().toString(), birth: newProfile, createdAt: new Date().toISOString() }
-      const next = [...profiles, profile]
+      let id = Date.now().toString()
+      if (getToken()) {
+        const name = `${newProfile.cityLabel} • ${newProfile.year}/${newProfile.month}/${newProfile.day} ${newProfile.hour}:${String(newProfile.minute).padStart(2, '0')}`
+        const sr = await authFetch('/profiles', { method: 'POST', body: JSON.stringify({
+          display_name: name, calendar: 'jalali', year: newProfile.year, month: newProfile.month, day: newProfile.day,
+          hour: newProfile.hour, minute: newProfile.minute, tz_offset: newProfile.tz_offset, lat: newProfile.lat, lon: newProfile.lon,
+        }) })
+        if (sr.ok) id = String((await sr.json()).id)
+        else if (sr.status !== 409) throw new Error('ذخیره پروفایل روی سرور انجام نشد')
+      }
+      const profile: Profile = { id, birth: newProfile, createdAt: new Date().toISOString() }
+      const next = [...profiles.filter((p) => p.id !== id), profile]
       setProfiles(next); saveProfiles(next)
       setShowResult(true)
     } catch (e: any) { setError(e.message) }
@@ -160,6 +187,7 @@ export default function DashboardPage() {
   const handleDelete = (id: string) => {
     const next = profiles.filter(p => p.id !== id)
     setProfiles(next); saveProfiles(next)
+    if (getToken() && /^\d+$/.test(id)) void authFetch(`/profiles/${id}`, { method: 'DELETE' }).catch(() => {})
   }
 
   const handleCitySelect = (c: any) => {

@@ -18,6 +18,7 @@ import {
   LogIn,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getToken, logout, onAuthChange } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useTheme } from 'next-themes'
@@ -79,6 +80,8 @@ export function BrandMark() {
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(!!getToken())
+  useEffect(() => onAuthChange(() => setLoggedIn(!!getToken())), [])
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
 
@@ -160,17 +163,29 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="flex shrink-0 items-center gap-1">
             <ThemeToggle />
 
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="hidden text-muted-foreground transition-all duration-200 hover:text-brand-200 sm:inline-flex"
-            >
-              <Link to="/auth">
+            {loggedIn ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="hidden text-muted-foreground transition-all duration-200 hover:text-brand-700 sm:inline-flex"
+              >
                 <LogIn className="ml-2 h-4 w-4" aria-hidden="true" />
-                ورود
-              </Link>
-            </Button>
+                خروج
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="hidden text-muted-foreground transition-all duration-200 hover:text-brand-700 sm:inline-flex"
+              >
+                <Link to="/auth">
+                  <LogIn className="ml-2 h-4 w-4" aria-hidden="true" />
+                  ورود
+                </Link>
+              </Button>
+            )}
 
             <Button
               size="sm"

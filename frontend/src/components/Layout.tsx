@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
+  BookOpen,
+  CalendarDays,
+  Clock,
+  MessageCircle,
   Compass,
   LayoutDashboard,
   Menu,
@@ -27,10 +31,11 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'چارت تولد', icon: Compass },
+  { to: '/today', label: 'امروز من', icon: CalendarDays },
+  { to: '/reading', label: 'تفسیر', icon: BookOpen },
+  { to: '/rectify', label: 'ساعت تولد', icon: Clock },
+  { to: '/chat', label: 'گفت‌وگو', icon: MessageCircle },
   { to: '/dashboard', label: 'داشبورد', icon: LayoutDashboard },
-  { to: '/pricing', label: 'بسته‌ها', icon: Wallet },
-  { to: '/settings', label: 'تنظیمات', icon: SettingsIcon },
-  { to: '/profile', label: 'پروفایل', icon: User },
 ]
 
 function ThemeToggle() {
@@ -172,10 +177,6 @@ export default function Layout({ children }: { children: ReactNode }) {
               className="vedic-gradient hidden shadow-lg shadow-brand-950/40 transition-all duration-300 hover:brightness-110 sm:inline-flex"
             >
               <Link to="/">محاسبه چارت</Link>
-            </Button>
-
-            <Button size="sm" variant="outline" asChild className="hidden xl:inline-flex">
-              <Link to="/reading">تفسیر چارت</Link>
             </Button>
 
             <Button

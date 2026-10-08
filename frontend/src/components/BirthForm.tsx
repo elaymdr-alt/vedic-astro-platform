@@ -42,14 +42,41 @@ interface CityOption {
   tz_offset: number
 }
 
+const STORE_KEY = 'ab_birth'
+
+/** Last submitted birth data, shared by every page (best effort — storage may be blocked). */
+export function loadSavedBirth(): BirthState | null {
+  try {
+    const raw = localStorage.getItem(STORE_KEY)
+    return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : null
+  } catch {
+    return null
+  }
+}
+
+export function saveBirth(b: BirthState) {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(b))
+  } catch {
+    /* storage unavailable: the app keeps working without persistence */
+  }
+}
+
 export default function BirthForm({
   onSubmit,
   loading,
+  showTime = true,
+  submitLabel = 'محاسبه چارت',
+  title = 'مشخصات تولد',
 }: {
   onSubmit: (b: BirthState) => void
   loading: boolean
+  /** hide hour/minute (e.g. when the time itself is being estimated) */
+  showTime?: boolean
+  submitLabel?: string
+  title?: string
 }) {
-  const [f, setF] = useState<BirthState>(DEFAULTS)
+  const [f, setF] = useState<BirthState>(() => loadSavedBirth() ?? DEFAULTS)
   const [q, setQ] = useState('')
   const [opts, setOpts] = useState<CityOption[]>([])
   const [searching, setSearching] = useState(false)
@@ -120,11 +147,12 @@ return (
       className="vedic-card p-6"
       onSubmit={(e) => {
         e.preventDefault()
+        saveBirth(f)
         onSubmit(f)
       }}
     >
       <header className="mb-6">
-        <h2 className="text-lg font-bold">مشخصات تولد</h2>
+        <h2 className="text-lg font-bold">{title}</h2>
         <p className="mt-1 text-xs text-muted-foreground">
           تاریخ شمسی و شهر محل تولد را وارد کنید.
         </p>
@@ -135,8 +163,8 @@ return (
           {numberField('سال', 'year')}
           {numberField('ماه', 'month', 1, 12)}
           {numberField('روز', 'day', 1, 31)}
-          {numberField('ساعت', 'hour', 0, 23)}
-          {numberField('دقیقه', 'minute', 0, 59)}
+          {showTime && numberField('ساعت', 'hour', 0, 23)}
+          {showTime && numberField('دقیقه', 'minute', 0, 59)}
         </div>
 
         <div className="space-y-2">
@@ -198,7 +226,7 @@ return (
               در حال محاسبه…
             </>
           ) : (
-            'محاسبه چارت'
+            submitLabel
           )}
         </Button>
       </div>

@@ -11,6 +11,8 @@ import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import Profile from './pages/Profile'
 import Reading from './pages/Reading'
+import Rectify from './pages/Rectify'
+import Today from './pages/Today'
 import { computeChart, PLANET_FA, type ChartResult } from './api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -211,6 +213,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reading" element={<Reading />} />
+        <Route path="/today" element={<Today />} />
+        <Route path="/rectify" element={<Rectify />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />

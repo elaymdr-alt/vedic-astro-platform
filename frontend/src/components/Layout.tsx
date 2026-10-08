@@ -106,7 +106,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         className={cn(
           'sticky top-0 z-50 w-full transition-all duration-300',
           scrolled
-            ? 'border-b border-white/[0.07] bg-background/70 backdrop-blur-xl backdrop-saturate-150'
+            ? 'border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-saturate-150'
             : 'border-b border-transparent bg-transparent',
         )}
       >
@@ -132,8 +132,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                   cn(
                     'group relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'text-brand-700 dark:text-brand-200'
-                      : 'text-muted-foreground hover:bg-white/[0.05] hover:text-foreground',
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                   )
                 }
               >
@@ -142,18 +142,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                     <Icon
                       className={cn(
                         'h-4 w-4 transition-transform duration-300 group-hover:scale-110',
-                        isActive && 'text-brand-400',
+                        isActive && 'text-primary',
                       )}
                       aria-hidden="true"
                     />
                     {label}
-                    <span
-                      className={cn(
-                        'absolute inset-x-3 -bottom-px h-px origin-center bg-gradient-to-l from-transparent via-brand-400 to-transparent transition-transform duration-300',
-                        isActive ? 'scale-x-100' : 'scale-x-0',
-                      )}
-                      aria-hidden="true"
-                    />
                   </>
                 )}
               </NavLink>
@@ -209,7 +202,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
         <div
           className={cn(
-            'grid overflow-hidden border-t border-white/[0.07] bg-background/90 backdrop-blur-xl transition-[grid-template-rows] duration-300 lg:hidden',
+            'grid overflow-hidden border-t border-border/60 bg-background/90 backdrop-blur-xl transition-[grid-template-rows] duration-300 lg:hidden',
             menuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
           )}
         >
@@ -224,8 +217,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                       cn(
                         'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-200',
                         isActive
-                          ? 'bg-brand-500/15 text-brand-200 ring-1 ring-brand-400/30'
-                          : 'text-muted-foreground hover:bg-white/[0.05] hover:text-foreground',
+                          ? 'bg-brand-500/15 text-primary ring-1 ring-brand-400/30'
+                          : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                       )
                     }
                   >
@@ -237,7 +230,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               <li className="sm:hidden">
                 <NavLink
                   to="/auth"
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-white/[0.05] hover:text-foreground"
+                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-muted/60 hover:text-foreground"
                 >
                   <LogIn className="h-4 w-4" aria-hidden="true" />
                   ورود / ثبت‌نام

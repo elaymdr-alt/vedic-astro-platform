@@ -34,7 +34,7 @@ function Card({ title, children, hint }: { title: string; hint?: string; childre
     <article className="chat-panel space-y-2 rounded-3xl p-5">
       <h3 className="font-bold text-[hsl(var(--primary))]">{title}</h3>
       {children}
-      {hint && <p className="rounded-2xl bg-[hsl(258_70%_95%)] p-3 text-sm leading-7"><b>پرسش تأملی:</b> {hint}</p>}
+      {hint && <p className="rounded-2xl bg-[hsl(var(--lavender))] p-3 text-sm leading-7"><b>پرسش تأملی:</b> {hint}</p>}
     </article>
   )
 }
@@ -84,7 +84,7 @@ export default function Psyche() {
     <div className="chat-theme min-h-[calc(100dvh-4rem)]">
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
         <header className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1.5 text-xs font-semibold text-[hsl(var(--primary))]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-card/80 px-4 py-1.5 text-xs font-semibold text-[hsl(var(--primary))]">
             <Brain className="h-3.5 w-3.5" aria-hidden="true" /> روان‌شناسی یونگی
           </span>
           <h1 className="mt-3 text-3xl font-extrabold text-[hsl(var(--primary))]">آشنایی با دنیای درونت</h1>
@@ -97,7 +97,7 @@ export default function Psyche() {
         <Link to="/dreams" className="chat-panel flex items-center justify-center gap-2 rounded-2xl p-3 text-sm font-semibold text-[hsl(var(--primary))]">
           <MoonStar className="h-4 w-4" aria-hidden="true" /> دفترچهٔ رؤیا و تأمل یونگی
         </Link>
-        {err && <div role="alert" className="rounded-2xl bg-white/80 p-3 text-center text-sm">{err}</div>}
+        {err && <div role="alert" className="rounded-2xl bg-card/85 p-3 text-center text-sm">{err}</div>}
 
         <section className="space-y-4" aria-labelledby="h-profile">
           <h2 id="h-profile" className="flex items-center gap-2 text-xl font-bold"><Sparkles className="h-5 w-5 text-amber-500" aria-hidden="true" /> نقشهٔ درونی از روی چارت</h2>
@@ -183,7 +183,7 @@ export default function Psyche() {
               <span className="text-xs text-muted-foreground">{fa(answered)} از {fa(quiz.length)} پاسخ (حداقل ۸)</span>
             </div>
             {result && (
-              <div className="rounded-2xl bg-[hsl(258_70%_95%)] p-4 text-sm leading-7" role="status">
+              <div className="rounded-2xl bg-[hsl(var(--lavender))] p-4 text-sm leading-7" role="status">
                 <div className="text-lg font-extrabold text-[hsl(var(--primary))]" dir="ltr">{result.code}</div>
                 <div>پشتهٔ کارکردها: {result.function_stack_fa.join(' ← ')}</div>
                 <p className="mt-1 text-xs text-muted-foreground">{result.note_fa}</p>

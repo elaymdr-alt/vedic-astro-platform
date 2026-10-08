@@ -112,7 +112,7 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/[0.07] bg-gradient-to-r from-brand-500/10 to-gold-500/10">
+      <section className="border-t border-border/60 bg-gradient-to-r from-brand-500/10 to-gold-500/10">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-100/30_to-transparent pointer-events-none" />
           <h2 className="text-3xl font-bold tracking-tight vedic-text-gradient relative z-10">آماده‌اید؟</h2>

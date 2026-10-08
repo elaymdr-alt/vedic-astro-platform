@@ -504,7 +504,7 @@ export function ConflictDetectorPanel({
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {conflicts.map((c, i) => (
           <div key={i} className="rounded-2xl border bg-background/70 p-4">
-            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">{c.title}</p>
+            <p className="text-xs font-semibold text-[hsl(var(--sun))] dark:text-amber-400">{c.title}</p>
             <p className="mt-2 text-xs leading-6 text-foreground/90">{c.desc}</p>
             <div className="mt-3 rounded-lg bg-muted/50 p-2.5 text-[11px] text-muted-foreground leading-5">
               <span className="font-semibold text-foreground ml-1">راه‌حل / سنتز:</span>

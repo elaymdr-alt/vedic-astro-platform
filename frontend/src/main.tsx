@@ -43,7 +43,7 @@ ReactDOM.createRoot(rootElement).render(
               toastOptions={{
                 classNames: {
                   toast:
-                    'group rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl text-slate-100 shadow-2xl',
+                    'group rounded-2xl border border-border bg-slate-900/90 backdrop-blur-xl text-slate-100 shadow-2xl',
                   description: 'text-slate-300',
                   actionButton: 'bg-brand-600 text-white rounded-lg',
                   cancelButton: 'bg-slate-800 text-slate-200 rounded-lg',

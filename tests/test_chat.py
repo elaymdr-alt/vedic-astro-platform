@@ -231,3 +231,10 @@ def test_invented_reference_footnotes_are_removed():
     g = StreamGuard()
     streamed = g.feed("خوب است [J1].\n[J1]: ساختگی.\nپایان.") + g.flush()
     assert "[J1]:" not in streamed and "پایان." in streamed
+
+
+def test_template_marker_artifacts_are_stripped():
+    out, _ = sanitize("بر پایه خانه ۱۱ [>>>]، فصل زحل [داده] است.")
+    assert "[>>>]" not in out and "[داده]" not in out and "فصل زحل" in out
+    g = StreamGuard()
+    assert "[داده]" not in (g.feed("فصل زحل [داده] است.") + g.flush())

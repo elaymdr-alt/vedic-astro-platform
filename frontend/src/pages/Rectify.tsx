@@ -111,8 +111,8 @@ export default function Rectify() {
           سامانه چارت را برای همه ساعت‌های محتمل می‌سازد و می‌بیند کدام ساعت با تاریخ رویدادهای مهم
           زندگی‌ات (ازدواج، کار، فرزند، مهاجرت…) هم‌خوان‌تر است.
         </p>
-        <div className="mx-auto mt-4 flex max-w-2xl items-start gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-start text-xs leading-6">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+        <div className="mx-auto mt-4 flex max-w-2xl items-start gap-2 rounded-2xl border border-[hsl(var(--sun))]/35 bg-[hsl(var(--sun-soft))] p-3 text-start text-xs leading-6">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--sun))]" aria-hidden="true" />
           <span>
             صادقانه: با رویدادهای زندگی نمی‌توان دقیقه را قطعی کرد؛ نتیجه یک <b>بازه محتمل</b> و
             احتمال هر <b>طالع</b> است. اگر شناسنامه، دفترچه واکسن یا گزارش بیمارستان دارید، همان معتبرتر است.
@@ -135,7 +135,7 @@ export default function Rectify() {
                   onClick={() => setWin(w.id)}
                   className={cn('rounded-full border px-4 py-2 text-sm transition-colors',
                     win === w.id ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-primary/25 bg-white/70 hover:bg-primary/10')}>
+                      : 'border-primary/25 bg-card/80 hover:bg-primary/10')}>
                   {w.label}
                 </button>
               ))}
@@ -150,7 +150,7 @@ export default function Rectify() {
             <h2 className="font-bold">۲. رویدادهای مهم زندگی (حداقل ۳ مورد، هرچه دقیق‌تر بهتر)</h2>
             <div className="space-y-3">
               {events.map((e, i) => (
-                <div key={i} className="grid grid-cols-2 items-end gap-2 rounded-2xl border border-primary/15 bg-white/60 p-3 sm:grid-cols-[1.6fr_.8fr_.6fr_.6fr_1fr_auto]">
+                <div key={i} className="grid grid-cols-2 items-end gap-2 rounded-2xl border border-primary/15 bg-card/70 p-3 sm:grid-cols-[1.6fr_.8fr_.6fr_.6fr_1fr_auto]">
                   <label className="col-span-2 text-xs text-muted-foreground sm:col-span-1">
                     رویداد
                     <select className="vedic-field mt-1 w-full" value={e.type}
@@ -214,7 +214,7 @@ export default function Rectify() {
             <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-lg font-bold">نتیجه</h2>
               {res.significance.informative
-                ? <Badge className="bg-fortune-green/15 text-emerald-800"><CheckCircle2 className="ml-1 h-3.5 w-3.5" /> رویدادها اطلاعات مفید دارند</Badge>
+                ? <Badge className="bg-fortune-green/15 text-success"><CheckCircle2 className="ml-1 h-3.5 w-3.5" /> رویدادها اطلاعات مفید دارند</Badge>
                 : <Badge variant="destructive">اطلاعات کافی نیست</Badge>}
               {res.significance.p_value !== null && (
                 <span className="num text-xs text-muted-foreground">
@@ -283,7 +283,7 @@ export default function Rectify() {
 
           <ul className="space-y-2 text-sm text-muted-foreground">
             {res.warnings.map((w) => (
-              <li key={w} className="flex gap-2"><AlertTriangle className="mt-1 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />{w}</li>
+              <li key={w} className="flex gap-2"><AlertTriangle className="mt-1 h-4 w-4 shrink-0 text-[hsl(var(--sun))]" aria-hidden="true" />{w}</li>
             ))}
           </ul>
         </section>

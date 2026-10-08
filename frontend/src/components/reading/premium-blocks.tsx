@@ -75,7 +75,7 @@ export function ExecutiveBanner({ pattern, signature, topThemes, topStrength, to
           <p className="mt-1 text-xs leading-6 font-semibold">{topStrength}</p>
         </div>
         <div className="rounded-2xl border border-amber-500/30 bg-background/60 p-3">
-          <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">مهم‌ترین زمینه‌ی رشد</p>
+          <p className="text-[11px] font-semibold text-[hsl(var(--sun))] dark:text-amber-400">مهم‌ترین زمینه‌ی رشد</p>
           <p className="mt-1 text-xs leading-6 font-semibold">{topGrowth}</p>
         </div>
       </div>
@@ -108,7 +108,7 @@ export function ThemeCard({ theme, index }: { theme: CoreTheme; index: number })
 export function ContradictionCard({ c }: { c: Contradiction }) {
   return (
     <article className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 sm:p-6">
-      <h3 className="font-display text-base font-bold text-amber-600 dark:text-amber-400">⚖ {c.title}</h3>
+      <h3 className="font-display text-base font-bold text-[hsl(var(--sun))] dark:text-amber-400">⚖ {c.title}</h3>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border bg-background/70 p-3">
           <p className="text-xs font-semibold">{c.factorA}</p>

@@ -22,11 +22,11 @@ export default function CosmicBackground({
   const timeRef = useRef(0)
 
   const orbs = useRef([
-    { x: 0.1, y: 0.2, r: 0.35, color: '262, 88%, 62%', speed: 0.15, phase: 0 },
-    { x: 0.9, y: 0.8, r: 0.28, color: '41, 92%, 58%', speed: 0.12, phase: Math.PI },
-    { x: 0.3, y: 0.7, r: 0.22, color: '262, 60%, 40%', speed: 0.18, phase: Math.PI / 2 },
-    { x: 0.7, y: 0.3, r: 0.18, color: '280, 70%, 55%', speed: 0.1, phase: Math.PI * 1.5 },
-    { x: 0.5, y: 0.5, r: 0.25, color: '300, 75%, 50%', speed: 0.08, phase: Math.PI / 4 },
+    { x: 0.1, y: 0.2, r: 0.35, color: '168, 55%, 45%', speed: 0.15, phase: 0 },
+    { x: 0.9, y: 0.8, r: 0.28, color: '28, 90%, 62%', speed: 0.12, phase: Math.PI },
+    { x: 0.3, y: 0.7, r: 0.22, color: '172, 45%, 32%', speed: 0.18, phase: Math.PI / 2 },
+    { x: 0.7, y: 0.3, r: 0.18, color: '190, 50%, 42%', speed: 0.1, phase: Math.PI * 1.5 },
+    { x: 0.5, y: 0.5, r: 0.25, color: '30, 70%, 52%', speed: 0.08, phase: Math.PI / 4 },
   ])
 
   const stars = useRef(

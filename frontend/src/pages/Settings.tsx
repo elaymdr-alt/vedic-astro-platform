@@ -61,7 +61,7 @@ export default function Settings() {
               <CardContent className="flex flex-col items-center pt-6">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src="" />
-                  <AvatarFallback className="text-2xl bg-brand-500/20 text-brand-200">عل</AvatarFallback>
+                  <AvatarFallback className="text-2xl bg-brand-500/20 text-primary">عل</AvatarFallback>
                 </Avatar>
                 <CardTitle className="mt-4">علی احمدی</CardTitle>
                 <CardDescription>عضو از سال 1402</CardDescription>

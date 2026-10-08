@@ -31,6 +31,7 @@ import {
 import { Reveal } from "@/components/reveal"
 import { ChapterDivider, SectionHeading } from "@/components/section-heading"
 import { Button } from "@/components/ui/button"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { computeChart } from "@/api"
 import { faNum, formatJalali, toPersianDigits } from "@/lib/astrology/format"
@@ -496,16 +497,14 @@ function ReadingView({
             <Reveal>
               <Card className="gap-0">
                 <CardContent className="pt-5">
-                  <div className="divide-y divide-border">
+                  <Accordion type="single" collapsible>
                     {doc.glossary.map((g) => (
-                      <details key={g.term} className="group py-3">
-                        <summary className="cursor-pointer list-none text-sm font-medium">
-                          {g.term}
-                        </summary>
-                        <p className="text-muted-foreground mt-2 leading-7">{g.body}</p>
-                      </details>
+                      <AccordionItem key={g.term} value={g.term}>
+                        <AccordionTrigger className="text-sm">{g.term}</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground leading-7">{g.body}</AccordionContent>
+                      </AccordionItem>
                     ))}
-                  </div>
+                  </Accordion>
                 </CardContent>
               </Card>
             </Reveal>

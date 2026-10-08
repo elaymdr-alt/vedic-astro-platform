@@ -98,7 +98,7 @@ export default function Dreams() {
                 {busy === 'save' && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />} ذخیره رؤیا
               </button>
             </form>
-            {err && <div role="alert" className="rounded-2xl bg-white/80 p-3 text-center text-sm">{err}</div>}
+            {err && <div role="alert" className="rounded-2xl bg-card/85 p-3 text-center text-sm">{err}</div>}
 
             <ul className="space-y-4">
               {dreams.map((d) => (

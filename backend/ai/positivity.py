@@ -28,6 +28,8 @@ BANNED = [
 _NORM = [normalize(b) for b in BANNED]
 _SPLIT = re.compile(r"(?<=[\.\!\?؟؛\n])")
 # models sometimes append an invented "[A1]: ..." reference list; sources are shown by the UI instead
+# stray template markers some models echo back ("[داده]", "[>>>]")
+_ARTIFACT = re.compile(r"\s*\[(?:داده|>>>|<<<|data)\]")
 _FOOTNOTE = re.compile(r"^\s*\[[AJ]\d+\]\s*[:：]")
 
 
@@ -40,6 +42,7 @@ def is_clean(sentence: str) -> bool:
 
 def sanitize(text: str) -> tuple[str, int]:
     """Drop every sentence holding a banned expression. Returns (text, dropped_count)."""
+    text = _ARTIFACT.sub("", text)
     parts = _SPLIT.split(text)
     kept = [p for p in parts if is_clean(p)]
     return "".join(kept).strip(), len(parts) - len(kept)
@@ -61,6 +64,7 @@ class StreamGuard:
             if not m:
                 break
             sent, self._buf = self._buf[: m.end()], self._buf[m.end():]
+            sent = _ARTIFACT.sub("", sent)
             if is_clean(sent):
                 out.append(sent)
             else:

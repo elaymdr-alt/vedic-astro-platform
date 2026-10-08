@@ -193,7 +193,7 @@ return (
                   <button
                     type="button"
                     onClick={() => pickCity(c)}
-                    className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:border-brand-400/40 hover:bg-brand-500/10 hover:text-brand-200"
+                    className="rounded-full border border-border bg-muted/60 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:border-primary/40 hover:bg-accent hover:text-accent-foreground"
                   >
                     {c.name_fa}
                   </button>
@@ -203,7 +203,7 @@ return (
           )}
         </div>
 
-        <div className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-xs leading-relaxed text-muted-foreground">
+        <div className="flex items-start gap-2.5 rounded-xl border border-border bg-muted/40 px-3.5 py-3 text-xs leading-relaxed text-muted-foreground">
           <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" aria-hidden="true" />
           <p className="num">
             شهر: <span className="font-medium text-foreground">{f.cityLabel}</span>

@@ -5,6 +5,8 @@ import {
 import BirthForm, { loadSavedBirth, type BirthState } from '@/components/BirthForm'
 import { cn } from '@/lib/utils'
 import { friendlyError } from '@/lib/net'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 type StyleId = 'auto' | 'hope' | 'love' | 'nudge' | 'guide' | 'calm' | 'comfort' | 'heart'
 interface Source { ref: string; title: string; source: string; page: number | null; kind: string }
@@ -65,7 +67,7 @@ function RichText({ text }: { text: string }) {
 
 function Breathing() {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white/60 p-3 text-xs text-[hsl(200_20%_32%)]" aria-live="off">
+    <div className="flex items-center gap-3 rounded-2xl bg-card/70 p-3 text-xs text-[hsl(var(--muted-foreground))]" aria-live="off">
       <span className="chat-breath h-9 w-9 shrink-0 rounded-full" aria-hidden="true" />
       <span>با دایره نفس بکش: دم ۴ ثانیه… بازدم ۶ ثانیه.</span>
     </div>
@@ -165,29 +167,30 @@ export default function Chat() {
           </p>
         </header>
 
-        <div role="radiogroup" aria-label="حال گفت‌وگو" className="flex flex-wrap justify-center gap-2">
+        <ToggleGroup type="single" value={style} onValueChange={(v) => v && setStyle(v as StyleId)}
+          aria-label="حال گفت‌وگو" className="flex flex-wrap justify-center gap-2">
           {STYLES.map((s) => {
             const Icon = s.icon
             return (
-              <button key={s.id} type="button" role="radio" aria-checked={style === s.id} title={s.hint}
-                onClick={() => setStyle(s.id)}
-                className={cn('chat-chip inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm transition-all',
-                  style === s.id && 'chat-chip-on')}>
+              <ToggleGroupItem key={s.id} value={s.id} title={s.hint}
+                className="chat-chip h-auto gap-1.5 rounded-full px-3.5 py-2 text-sm data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                 <Icon className="h-4 w-4" aria-hidden="true" /> {s.label}
-              </button>
+              </ToggleGroupItem>
             )
           })}
-        </div>
+        </ToggleGroup>
 
         {style === 'calm' && <Breathing />}
 
         {configured === false && (
-          <div role="status" className="rounded-2xl bg-white/70 p-3 text-center text-xs leading-6 text-muted-foreground">
-            دستیار هنوز به OpenRouter وصل نشده است. مدیر سایت باید متغیر <span dir="ltr">OPENROUTER_API_KEY</span> را تنظیم کند.
-          </div>
+          <Alert>
+            <AlertDescription>
+              دستیار هنوز به OpenRouter وصل نشده است. مدیر سایت باید متغیر <span dir="ltr">OPENROUTER_API_KEY</span> را تنظیم کند.
+            </AlertDescription>
+          </Alert>
         )}
         {!birth && (
-          <div className="rounded-2xl bg-white/70 p-3 text-center text-sm">
+          <div className="rounded-2xl bg-card/80 p-3 text-center text-sm">
             برای پاسخ‌های شخصی‌تر، اطلاعات تولدت را وارد کن{' '}
             <button type="button" className="font-semibold text-[hsl(var(--primary))] underline" onClick={() => setAskBirth(true)}>
               وارد کردن تولد
@@ -203,7 +206,7 @@ export default function Chat() {
           className="chat-panel flex min-h-[40vh] max-h-[58vh] flex-col gap-3 overflow-y-auto rounded-3xl p-4">
           {msgs.length === 0 && (
             <div className="m-auto max-w-md text-center">
-              <p className="text-base leading-8 text-[hsl(200_25%_22%)]">
+              <p className="text-base leading-8 text-[hsl(var(--foreground))]">
                 سلام؛ خوش آمدی. هر چه در دلت هست بگو، من اینجا هستم و با هم یک قدم آرام‌تر برمی‌داریم.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">

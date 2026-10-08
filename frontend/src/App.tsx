@@ -97,7 +97,7 @@ function HomePage() {
 
           {!chart && !error && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-white/[0.04]">
                 <Compass className="h-7 w-7 text-brand-400/60" aria-hidden="true" />
               </div>
               <p className="text-sm text-muted-foreground">
@@ -119,7 +119,7 @@ function HomePage() {
               ) : (
                 <>
                   <div
-                    className="mb-6 inline-flex rounded-2xl border border-white/10 bg-white/[0.04] p-1 backdrop-blur-md"
+                    className="mb-6 inline-flex rounded-2xl border border-border bg-white/[0.04] p-1 backdrop-blur-md"
                     role="group"
                     aria-label="انتخاب وارگا"
                   >
@@ -138,7 +138,7 @@ function HomePage() {
                           'rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300',
                           mode === key
                             ? 'vedic-gradient text-white shadow-lg shadow-brand-900/40'
-                            : 'text-muted-foreground hover:bg-white/[0.05] hover:text-foreground',
+                            : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                         )}
                       >
                         {label}

@@ -1,4 +1,4 @@
-/** Light-theme backdrop: thin crimson orbit arcs, 4-point sparkles and glossy beads. */
+/** Light-theme backdrop: thin teal arcs, apricot sparkles and beads (Soft Dawn). */
 const Sparkle = ({ x, y, s }: { x: number; y: number; s: number }) => (
   <path
     transform={`translate(${x} ${y}) scale(${s})`}
@@ -22,16 +22,16 @@ export default function OrbitDecor() {
     >
       <defs>
         <linearGradient id="ab-red" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ff6b7d" />
-          <stop offset="1" stopColor="#c8102e" />
+          <stop offset="0" stopColor="#f9b872" />
+          <stop offset="1" stopColor="#f08a30" />
         </linearGradient>
         <radialGradient id="ab-bead" cx="30%" cy="30%" r="80%">
-          <stop offset="0" stopColor="#ff8a98" />
-          <stop offset="0.55" stopColor="#c8102e" />
-          <stop offset="1" stopColor="#7f0a1d" />
+          <stop offset="0" stopColor="#fbd3a6" />
+          <stop offset="0.55" stopColor="#f08a30" />
+          <stop offset="1" stopColor="#d96f17" />
         </radialGradient>
       </defs>
-      <g stroke="#e0485c" strokeOpacity="0.35" strokeWidth="1.4">
+      <g stroke="#2f9a82" strokeOpacity="0.22" strokeWidth="1.4">
         <path d="M820 -20 C 1010 140 1030 420 960 560" />
         <path d="M-40 260 C 120 520 40 900 -30 1080" />
         <path d="M60 1000 C 20 1180 220 1320 460 1260" />

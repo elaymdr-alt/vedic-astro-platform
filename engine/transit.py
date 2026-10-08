@@ -154,7 +154,7 @@ def transit_scan(
 
     ingresses: list[dict[str, Any]] = []
     contacts: list[dict[str, Any]] = []
-    seen_pairs: set[tuple[str, str, str]] = set()
+    pass_count: dict[tuple[str, str, str], int] = {}
 
     for i in range(len(samples) - 1):
         dt0, s0 = samples[i]
@@ -193,9 +193,9 @@ def transit_scan(
                     if not (f0 == 0.0 or (f0 * f1 < 0 and abs(f1 - f0) < 180.0)):
                         continue
                     key = (t_name, n["name"], angle_name)
-                    if key in seen_pairs:
-                        continue
-                    seen_pairs.add(key)
+                    # Retrograde stations make a planet cross the same point up to
+                    # three times: every crossing is recorded with its pass number.
+                    pass_count[key] = pass_count.get(key, 0) + 1
                     at = _refine_contact(natal, t_name, n["name"], angle, dt0, dt1)
                     bodies_e, _ = planet_positions(jd_from_utc(at))
                     lon_e = next(b["longitude"] for b in bodies_e if b["name"] == t_name)
@@ -205,6 +205,8 @@ def transit_scan(
                         "natal": n["name"],
                         "natal_fa": PLANETS_FA.get(n["name"], n["name"]),
                         "aspect": angle_name,
+                        "pass_no": pass_count[key],
+                        "retrograde": bool(t0["retrograde"] and t1["retrograde"]),
                         "at_utc": at.astimezone(timezone.utc).isoformat(),
                         "house_in_natal": _house_of(lon_e, asc_sign),
                     })

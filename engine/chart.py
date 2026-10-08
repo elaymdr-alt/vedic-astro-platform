@@ -23,7 +23,7 @@ def _deg_in_sign(lon: float) -> tuple[int, float]:
     return int(lon // 30), round(lon % 30.0, 4)
 
 
-def planet_positions(jd_ut: float) -> tuple[list[dict[str, Any]], float]:
+def planet_positions(jd_ut: float, node: str = "mean") -> tuple[list[dict[str, Any]], float]:
     """Sidereal positions of the 9 bodies at a Julian Day (UT).
 
     Returns ``(bodies, moon_longitude)`` — sign, D9, speed and retrograde are
@@ -36,7 +36,7 @@ def planet_positions(jd_ut: float) -> tuple[list[dict[str, Any]], float]:
     for name in PLANETS:
         if name == "Ketu":
             continue
-        pos = eph.body_longitude(name, jd_ut)
+        pos = eph.body_longitude(name, jd_ut, node)
         if name == "Moon":
             moon_lon = pos.longitude
         sign, deg = _deg_in_sign(pos.longitude)
@@ -73,6 +73,7 @@ def compute_chart(
     hour_local: float, tz_offset: float,
     lat: float, lon: float,
     time_precision: str = "exact",
+    node: str = "mean",
 ) -> dict[str, Any]:
     """Compute sidereal chart. `hour_local` in decimal hours, `tz_offset` e.g. +3.5.
 
@@ -81,7 +82,7 @@ def compute_chart(
     hour_ut = hour_local - tz_offset
     jd_ut = eph.julday(year, month, day, hour_ut)
 
-    bodies, moon_lon = planet_positions(jd_ut)
+    bodies, moon_lon = planet_positions(jd_ut, node)
     limited = time_precision == "unknown"
 
     if limited:
@@ -93,8 +94,10 @@ def compute_chart(
             "reference_time": "noon_local",
             "ayanamsa_lahiri": round(eph.ayanamsa_value(jd_ut), 4),
             "ephemeris_flag": eph.ephemeris_flag(),
+            "node": node,
             "julian_day_ut": round(jd_ut, 5),
             "ascendant": None,
+            "midheaven": None,
             "planets": bodies,
             "houses_whole_sign": None,
             "moon_nakshatra": None,
@@ -102,6 +105,7 @@ def compute_chart(
         }
 
     asc_lon, _cusps = eph.houses_cusps_whole_sign(jd_ut, lat, lon)
+    _, mc_lon = eph.sidereal_angles(jd_ut, lat, lon)
     asc_sign, asc_deg = _deg_in_sign(asc_lon)
     asc_d9 = navamsa_of(asc_lon)
 
@@ -125,6 +129,7 @@ def compute_chart(
         "reference_time": None,
         "ayanamsa_lahiri": round(eph.ayanamsa_value(jd_ut), 4),
         "ephemeris_flag": eph.ephemeris_flag(),
+        "node": node,
         "julian_day_ut": round(jd_ut, 5),
         "ascendant": {
             "longitude": round(asc_lon, 4), "sign_index": asc_sign,
@@ -134,6 +139,7 @@ def compute_chart(
             "d9_sign": SIGNS_EN[asc_d9["sign_index"]],
             "d9_longitude": asc_d9["longitude"],
         },
+        "midheaven": {"longitude": round(mc_lon, 4), "sign_index": int(mc_lon // 30)},
         "planets": bodies,
         "houses_whole_sign": houses,
         "moon_nakshatra": moon_nk,

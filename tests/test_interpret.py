@@ -72,3 +72,28 @@ def test_report_security_no_cross_profile_leak():
     # reports are independent objects with no shared references
     assert a is not b
     assert a["paragraphs"] is not b["paragraphs"]
+
+
+def test_new_rules_are_traceable_and_hedged():
+    rep = interpret_chart(natal())
+    ids = {p["rule_id"] for p in rep["paragraphs"]}
+    assert {"LAGNA_LORD_HOUSE", "MARS_HOUSE", "MERCURY_HOUSE", "JUPITER_HOUSE", "VENUS_HOUSE"} <= ids
+    for p in rep["paragraphs"]:
+        assert p["evidence"], p["rule_id"]
+        assert not any(bad in p["text_fa"] for bad in FORBIDDEN_PHRASES), p["rule_id"]
+
+
+def test_time_dependent_new_rules_are_skipped_when_time_unknown():
+    rep = interpret_chart(natal(time_precision="unknown"))
+    ids = {p["rule_id"] for p in rep["paragraphs"]}
+    assert not ids & {"LAGNA_LORD_HOUSE", "MARS_HOUSE", "MERCURY_HOUSE", "JUPITER_HOUSE", "VENUS_HOUSE"}
+    skipped = {s["rule_id"] for s in rep["suppressed"]}
+    assert "LAGNA_LORD_HOUSE" in skipped or "LAGNA_LORD_HOUSE" not in ids
+
+
+def test_forbidden_phrase_guard_drops_offending_paragraph(monkeypatch):
+    from engine import interpret as it
+    monkeypatch.setattr(it, "FORBIDDEN_PHRASES", it.FORBIDDEN_PHRASES + ["ممکن است"])
+    rep = it.interpret_chart(natal())
+    assert any(s["reason"] == "forbidden_phrase" for s in rep["suppressed"])
+    assert all("ممکن است" not in p["text_fa"] for p in rep["paragraphs"])

@@ -7,8 +7,10 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-RULES_VERSION = "1.0.0"
-REPORT_VERSION = "1.0.0"
+from .constants import SIGN_LORDS
+
+RULES_VERSION = "1.1.0"
+REPORT_VERSION = "1.1.0"
 
 EFFECTIVE_SETTINGS = {
     "zodiac": "sidereal",
@@ -16,7 +18,21 @@ EFFECTIVE_SETTINGS = {
     "houses": "whole_sign",
 }
 
-FORBIDDEN_PHRASES = ["حتما", "قطعا", "تضمینی", "صددرصد", "صد در صد"]
+FORBIDDEN_PHRASES = [
+    "حتما", "حتماً", "قطعا", "قطعاً", "تضمینی", "صددرصد", "صد در صد",
+    "بدون شک", "همیشه", "هیچ‌گاه", "تأثیر می‌گذارد", "باعث می‌شود",
+]
+
+HOUSE_THEME_FA = {
+    1: "خود و شخصیت", 2: "درآمد و ارزش‌ها", 3: "تلاش، ارتباط و هم‌نشینان نزدیک",
+    4: "خانه، ریشه و آرامش درونی", 5: "خلاقیت، آموزش و فرزندان",
+    6: "کار روزمره، سلامت و چالش‌ها", 7: "شراکت و رابطه نزدیک",
+    8: "تحول، منابع مشترک و رازها", 9: "باور، مسیر و آموزه‌ها",
+    10: "کار و جایگاه اجتماعی", 11: "دستاوردها و شبکه دوستان", 12: "خلوت، پایان‌ها و رهایی",
+}
+PLANET_FA = {
+    "Mars": "مریخ", "Mercury": "عطارد", "Jupiter": "مشتری", "Venus": "زهره",
+}
 
 
 def _planet(chart: dict[str, Any], name: str) -> dict[str, Any] | None:
@@ -81,7 +97,7 @@ def _rules() -> list:
     def sun_sign_render(c):
         s = _planet(c, "Sun")
         return (
-            "شمس در برج " + s["sign_fa"] + " است؛ این placement کلی بر شخصیت و رفتار تأثیر می‌گذارد.",
+            "شمس در برج " + s["sign_fa"] + " است؛ این placement ممکن است با هویت و شیوه بروز خود مرتبط دانسته شود.",
             {"sun": _ev_house(s)},
         )
 
@@ -108,7 +124,47 @@ def _rules() -> list:
             {"saturn": _ev_house(s)},
         )
 
+    def planet_house_rule(name: str):
+        def render(c):
+            p = _planet(c, name)
+            theme = HOUSE_THEME_FA[p["house"]]
+            return (
+                PLANET_FA[name] + " در خانه " + str(p["house"]) + " قرار دارد؛ در خوانش ودیک این "
+                "placement ممکن است با حوزه «" + theme + "» مرتبط دانسته شود.",
+                {name.lower(): _ev_house(p)},
+            )
+        return Rule(
+            name.upper() + "_HOUSE", name.lower(), 45, True,
+            lambda c, n=name: (_planet(c, n) or {}).get("house") is not None, render,
+        )
+
+    def lagna_lord_render(c):
+        a = c["ascendant"]
+        lord = SIGN_LORDS[a["sign_index"]]
+        p = _planet(c, lord)
+        return (
+            "حاکم طالع (" + lord + ") در خانه " + str(p["house"]) + " است؛ در برخی خوانش‌ها محل "
+            "حاکم طالع را نشانه‌ای از جایی می‌دانند که انرژی شخص بیشتر صرف آن می‌شود.",
+            {"lagna_lord": {"planet": lord, "house": p["house"], "sign": p["sign"]}},
+        )
+
+    def gaja_kesari_render(c):
+        j, m = _planet(c, "Jupiter"), _planet(c, "Moon")
+        dist = (j["sign_index"] - m["sign_index"]) % 12 + 1
+        return (
+            "مشتری در خانه " + str(dist) + " از قمر قرار دارد (کندرا)؛ این ترکیب با نام «گاجا کِساری» "
+            "در منابع کلاسیک ودیک ذکر می‌شود و ممکن است با حمایت و بینش مرتبط دانسته شود.",
+            {"jupiter_from_moon": dist, "jupiter": _ev_house(j), "moon": _ev_house(m)},
+        )
+
+    def gaja_kesari_applies(c):
+        j, m = _planet(c, "Jupiter"), _planet(c, "Moon")
+        return bool(j and m and ((j["sign_index"] - m["sign_index"]) % 12) in (0, 3, 6, 9))
+
     return [
+        Rule("LAGNA_LORD_HOUSE", "lagna_lord", 55, True, _has_asc, lagna_lord_render),
+        Rule("GAJA_KESARI", "yoga", 48, False, gaja_kesari_applies, gaja_kesari_render),
+        *[planet_house_rule(n) for n in ("Mars", "Mercury", "Jupiter", "Venus")],
         Rule("ASC_SIGN", "ascendant", 100, True, lambda c: _has_asc(c) or c.get("time_precision") == "unknown", asc_render),
         Rule("MOON_SIGN", "moon", 90, False, lambda c: _planet(c, "Moon") is not None, moon_render),
         Rule("MOON_NAKSHATRA", "moon", 80, True, lambda c: bool(c.get("moon_nakshatra")) or c.get("time_precision") == "unknown", moon_nk_render),
@@ -145,6 +201,9 @@ def interpret_chart(chart: dict[str, Any]) -> dict[str, Any]:
         contenders.sort(key=lambda r: r.priority, reverse=True)
         winner = contenders[0]
         text, evidence = winner.render(chart)
+        if any(bad in text for bad in FORBIDDEN_PHRASES):
+            suppressed.append({"rule_id": winner.id, "reason": "forbidden_phrase"})
+            continue
         paragraphs.append({
             "rule_id": winner.id,
             "topic": topic,

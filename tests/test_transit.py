@@ -73,3 +73,20 @@ def test_scan_works_without_birth_time():
     assert scan["days"] == 15
     for ev in scan["ingresses"]:
         assert ev["house_in_natal"] is None  # no ascendant -> no house
+
+
+def test_contacts_carry_pass_number_and_retrograde_flag():
+    from datetime import datetime, timezone
+    from engine import compute_chart
+    from engine.transit import transit_scan
+    natal = compute_chart(1993, 4, 17, 6.7, 3.5, 35.69, 51.39)
+    scan = transit_scan(natal, datetime(2024, 1, 1, tzinfo=timezone.utc), 90)
+    assert scan["contacts"]
+    for c in scan["contacts"]:
+        assert c["pass_no"] >= 1 and isinstance(c["retrograde"], bool)
+    # repeated crossings of the same point are kept, numbered 1, 2, 3 ...
+    seen = {}
+    for c in sorted(scan["contacts"], key=lambda x: x["at_utc"]):
+        k = (c["transit"], c["natal"], c["aspect"])
+        seen[k] = seen.get(k, 0) + 1
+        assert c["pass_no"] == seen[k]

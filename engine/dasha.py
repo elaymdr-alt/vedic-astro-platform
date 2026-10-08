@@ -52,14 +52,39 @@ def vimshottari(moon_lon: float, birth_date: date, years_ahead: int = 120) -> di
         i += 1
         guard += 1
 
-    antars = _antardashas(mahadashas[0]["lord"], date.fromisoformat(mahadashas[0]["start"]),
-                          date.fromisoformat(mahadashas[0]["end"]))
+    # Sub-periods are defined on the FULL mahadasha; the birth falls inside it,
+    # so the balance mahadasha only shows the part from birth onwards.
+    first_len = DASHA_YEARS[start_lord] * 365.25
+    full_start = birth_date - timedelta(days=round(first_len - balance_years * 365.25))
+    full_end = full_start + timedelta(days=round(first_len))
+    for idx, md in enumerate(mahadashas):
+        md_start = date.fromisoformat(md["start"])
+        md_end = date.fromisoformat(md["end"])
+        if idx == 0:
+            md["antardashas"] = _clip(_antardashas(md["lord"], full_start, full_end), md_start, md_end)
+        else:
+            md["antardashas"] = _antardashas(md["lord"], md_start, md_end)
+    antars = mahadashas[0]["antardashas"]
     return {
         "birth_nakshatra": nk,
         "balance_years": balance_years,
+        "year_basis_days": 365.25,
+        "date_resolution": "day",
         "mahadashas": mahadashas,
         "antardashas_of_first": antars,
     }
+
+
+def _clip(periods: list[dict], start: date, end: date) -> list[dict]:
+    """Keep only the part of ``periods`` that lies within [start, end]."""
+    out = []
+    for p in periods:
+        ps, pe = date.fromisoformat(p["start"]), date.fromisoformat(p["end"])
+        if pe <= start or ps >= end:
+            continue
+        out.append({"lord": p["lord"], "start": max(ps, start).isoformat(),
+                    "end": min(pe, end).isoformat()})
+    return out
 
 
 def _antardashas(md_lord: str, start: date, end: date) -> list[dict]:

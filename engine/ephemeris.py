@@ -106,6 +106,10 @@ def julday(year: int, month: int, day: int, hour_ut: float) -> float:
 def body_longitude(planet: str, jd_ut: float, node: str = "mean") -> BodyPos:
     """Sidereal position. ``planet`` may be a classical planet or ``Rahu``
     (``node``: "mean" | "true")."""
+    if planet == "Ketu":  # always exactly opposite Rahu, same motion
+        r = body_longitude("Rahu", jd_ut, node)
+        return BodyPos(name="Ketu", longitude=(r.longitude + 180.0) % 360.0, latitude=-r.latitude,
+                       speed_lon=r.speed_lon, retrograde=True)
     if planet == "Rahu":
         if node not in NODE_IDS:
             raise ValueError(f"unknown node type: {node}")

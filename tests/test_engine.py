@@ -173,3 +173,10 @@ def test_swiss_files_are_used_and_agree_with_reference_when_present():
         assert abs(((moon - expected + 180) % 360) - 180) < 0.05
     finally:
         eph.configure(strict=False)
+
+
+def test_ketu_is_opposite_rahu_in_the_adapter():
+    jd = eph.julday(2000, 1, 1, 12.0)
+    rahu, ketu = eph.body_longitude("Rahu", jd), eph.body_longitude("Ketu", jd)
+    assert abs(((ketu.longitude - rahu.longitude) % 360.0) - 180.0) < 1e-9
+    assert ketu.retrograde and ketu.speed_lon == rahu.speed_lon

@@ -18,11 +18,11 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-500/10 to-transparent pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 text-center relative z-10">
-          <Badge variant="secondary" className="mb-4 bg-gold-500/15 text-gold-200 ring-1 ring-gold-400/30 hover:bg-gold-500/25">
+          <Badge variant="secondary" className="mb-4 bg-gold-500/15 text-brand-700 dark:text-gold-200 ring-1 ring-gold-400/30 hover:bg-gold-500/25">
             <Sparkles className="mr-1 h-3 w-3" /> منظومه کامل طالع‌بینی
           </Badge>
-          <h1 className="text-5xl font-bold tracking-tight sm:text-7xl vedic-text-gradient">
-            طالع‌بینی ودیک
+          <h1 className="mx-auto">
+            <img src="/logo.png" alt="AstroBinesh" className="mx-auto h-40 w-auto sm:h-56" />
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-2xl mx-auto">
             دقت و دقت در تحلیل نجومی با سیستم‌های اعلامی، داشا، ترانزیت و تحلیل زوجین
@@ -31,7 +31,7 @@ export default function Landing() {
             <Button asChild size="lg" className="bg-brand-600 hover:bg-brand-700 transition-all duration-300 hover:scale-105">
               <Link to="/auth">شروع کنید</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-gold-400/60 text-gold-300 hover:bg-gold-500/10">
+            <Button asChild variant="outline" size="lg" className="border-gold-400/60 text-brand-700 dark:text-gold-300 hover:bg-gold-500/10">
               <Link to="/pricing">بسته‌ها</Link>
             </Button>
           </div>

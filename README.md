@@ -1,11 +1,11 @@
-# Vedic Astro Platform — Monorepo
+# AstroBinesh — Monorepo
 
 Platform-e web-e Farsi/RTL baraye tale-bini-ye Vedic (Jyotish).
 
 ## Sakhtar
 
 ```
-vedic-astro-platform/
+astrobinesh/
 ├── engine/      # Motor-e nojumi-ye khales (bedoon-e vabastegi be web) — P06
 │   ├── constants.py   # Namadha, Nakshatra, Dasha sequence
 │   ├── ephemeris.py   # Adapter-e Swiss Ephemeris (Lahiri + fallback Moshier)

@@ -48,7 +48,7 @@ const PLANET_FA: Record<string, string> = {
   Venus: 'زهره', Saturn: 'زحل', Rahu: 'راهو', Ketu: 'کیتو',
 }
 const SIGN_FA = ['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت']
-const COLORS = ['#9333ea','#f59e0b','#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#06b6d4','#84cc16','#eab308','#a855f7','#22d3ee']
+const COLORS = ['#c8102e','#7f0a1d','#f05b6e','#e08a1e','#a50d26','#ff9ca7','#5e0715','#dc2640','#b45309','#f59e0b','#8f0a1f','#ffc9cf']
 
 const monthlyStats = [
   { month: 'فروردین', charts: 12, readings: 8, premium: 3 },

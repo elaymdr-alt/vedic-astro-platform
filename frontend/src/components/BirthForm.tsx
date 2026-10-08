@@ -15,6 +15,8 @@ export interface BirthState {
   lat: number
   lon: number
   tz_offset: number
+  /** IANA zone — the backend derives the real (historical/DST) offset from it */
+  tz: string
   cityLabel: string
 }
 
@@ -28,11 +30,13 @@ const DEFAULTS: BirthState = {
   lat: 35.6892,
   lon: 51.389,
   tz_offset: 3.5,
+  tz: 'Asia/Tehran',
   cityLabel: 'تهران',
 }
 
 interface CityOption {
   name_fa: string
+  tz?: string
   lat: number
   lon: number
   tz_offset: number
@@ -82,6 +86,7 @@ export default function BirthForm({
       lat: c.lat,
       lon: c.lon,
       tz_offset: c.tz_offset,
+      tz: c.tz ?? s.tz,
       cityLabel: c.name_fa,
     }))
     setOpts([])

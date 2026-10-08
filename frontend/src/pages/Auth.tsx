@@ -33,7 +33,9 @@ export default function Auth() {
           <div className="mx-auto w-16 h-16 rounded-full bg-brand-500/15 ring-1 ring-brand-400/25 flex items-center justify-center">
             <Star className="h-8 w-8 text-brand-600" />
           </div>
-          <CardTitle className="text-2xl vedic-text-gradient">طالع‌بینی ودیک</CardTitle>
+          <CardTitle className="text-2xl">
+            <img src="/logo.png" alt="AstroBinesh" className="mx-auto h-24 w-auto" />
+          </CardTitle>
           <CardDescription>ورود به حساب خود یا ثبت‌نام</CardDescription>
         </CardHeader>
         <Tabs defaultValue="login">

@@ -3,69 +3,65 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   Vedic Astro — Cosmic Luxury Design Tokens
+   AstroBinesh — Crimson Porcelain Design Tokens
    ========================================================================== */
 
 @layer base {
+  /* AstroBinesh theme — porcelain white + crimson (default, light) */
   :root,
-  .dark {
-    /* Surfaces — deep indigo obsidian */
-    --background: 250 45% 4%;
-    --foreground: 45 40% 96%;
-    --card: 250 32% 7%;
-    --card-foreground: 45 40% 96%;
-    --popover: 250 35% 6%;
-    --popover-foreground: 45 40% 96%;
-
-    /* Brand — violet (cosmic) */
-    --primary: 262 88% 62%;
+  .light {
+    --background: 0 60% 98%;
+    --foreground: 350 78% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 350 78% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 350 78% 16%;
+    --primary: 350 86% 41%;
     --primary-foreground: 0 0% 100%;
+    --secondary: 350 100% 96%;
+    --secondary-foreground: 350 80% 28%;
+    --muted: 352 70% 96%;
+    --muted-foreground: 350 22% 36%;
+    --accent: 350 100% 95%;
+    --accent-foreground: 350 86% 32%;
+    --destructive: 0 78% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 62% 32%;
+    --success-foreground: 0 0% 100%;
+    --border: 352 70% 90%;
+    --input: 352 70% 88%;
+    --ring: 350 86% 41%;
+    --radius: 1.25rem;
+    --glow-violet: 350 86% 50%;
+    --glow-gold: 350 100% 75%;
+  }
 
-    /* Accent — saffron gold (Vedic) */
-    --secondary: 41 92% 58%;
-    --secondary-foreground: 250 45% 8%;
-
-    --muted: 250 22% 14%;
-    --muted-foreground: 250 14% 68%;
-    --accent: 262 60% 20%;
-    --accent-foreground: 45 40% 96%;
+  /* Dark variant — deep wine, same crimson accent */
+  .dark {
+    --background: 350 45% 5%;
+    --foreground: 0 40% 96%;
+    --card: 350 35% 8%;
+    --card-foreground: 0 40% 96%;
+    --popover: 350 38% 7%;
+    --popover-foreground: 0 40% 96%;
+    --primary: 350 88% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 350 40% 16%;
+    --secondary-foreground: 0 40% 96%;
+    --muted: 350 28% 14%;
+    --muted-foreground: 350 16% 70%;
+    --accent: 350 50% 18%;
+    --accent-foreground: 0 40% 96%;
     --destructive: 0 78% 58%;
     --destructive-foreground: 0 0% 100%;
     --success: 152 62% 45%;
     --success-foreground: 0 0% 100%;
-
-    --border: 250 24% 17%;
-    --input: 250 24% 17%;
-    --ring: 262 88% 62%;
-    --radius: 0.9rem;
-
-    /* Ambient glow colours used by the backdrop */
-    --glow-violet: 262 88% 62%;
-    --glow-gold: 41 92% 58%;
-  }
-
-  .light {
-    --background: 250 40% 99%;
-    --foreground: 250 45% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 250 45% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 250 45% 10%;
-    --primary: 262 78% 52%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 41 92% 50%;
-    --secondary-foreground: 250 45% 8%;
-    --muted: 250 30% 96%;
-    --muted-foreground: 250 12% 42%;
-    --accent: 262 70% 96%;
-    --accent-foreground: 262 78% 40%;
-    --destructive: 0 78% 52%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 152 62% 38%;
-    --success-foreground: 0 0% 100%;
-    --border: 250 24% 90%;
-    --input: 250 24% 90%;
-    --ring: 262 78% 52%;
+    --border: 350 26% 18%;
+    --input: 350 26% 18%;
+    --ring: 350 88% 56%;
+    --radius: 1.25rem;
+    --glow-violet: 350 88% 56%;
+    --glow-gold: 350 100% 70%;
   }
 
   * {
@@ -143,9 +139,9 @@
     z-index: -10;
     pointer-events: none;
     background:
-      radial-gradient(60rem 40rem at 85% -10%, hsl(var(--glow-violet) / 0.22), transparent 60%),
-      radial-gradient(45rem 35rem at 5% 10%, hsl(190 90% 55% / 0.12), transparent 60%),
-      radial-gradient(50rem 40rem at 50% 110%, hsl(var(--glow-gold) / 0.12), transparent 60%);
+      radial-gradient(60rem 40rem at 85% -10%, hsl(var(--glow-violet) / 0.10), transparent 60%),
+      radial-gradient(45rem 35rem at 5% 10%, hsl(var(--glow-gold) / 0.18), transparent 60%),
+      radial-gradient(50rem 40rem at 50% 110%, hsl(var(--glow-gold) / 0.14), transparent 60%);
   }
 
   .vedic-grid-overlay {
@@ -180,10 +176,18 @@
       0 0 0 1px hsl(var(--glow-violet) / 0.12);
   }
   .light .glass {
-    @apply border-slate-200/80 bg-white/80;
+    @apply rounded-3xl border border-rose-200/70 bg-white/75;
     box-shadow:
-      0 1px 2px 0 hsl(250 40% 20% / 0.04),
-      0 18px 40px -22px hsl(250 40% 30% / 0.28);
+      0 1px 0 0 hsl(0 0% 100% / 0.9) inset,
+      0 22px 44px -26px hsl(350 86% 41% / 0.30),
+      0 6px 18px -10px hsl(350 86% 41% / 0.14);
+  }
+  .light .glass:hover {
+    @apply border-rose-300/80 bg-white/90;
+    box-shadow:
+      0 1px 0 0 hsl(0 0% 100% / 0.9) inset,
+      0 28px 56px -26px hsl(350 86% 41% / 0.36),
+      0 0 0 1px hsl(350 86% 41% / 0.10);
   }
 
   .vedic-card {
@@ -202,11 +206,11 @@
     @apply bg-gradient-to-br from-gold-300 via-gold-400 to-gold-600;
   }
   .vedic-text-gradient {
-    @apply bg-gradient-to-l from-brand-300 via-brand-400 to-gold-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-l from-brand-300 via-brand-400 to-brand-500 bg-clip-text text-transparent;
     filter: drop-shadow(0 2px 12px hsl(var(--glow-violet) / 0.35));
   }
   .light .vedic-text-gradient {
-    @apply from-brand-600 via-brand-700 to-gold-600;
+    @apply from-brand-600 via-brand-800 to-brand-900;
     filter: none;
   }
   .vedic-divider {
@@ -259,9 +263,10 @@
 
   /* ---- Misc -------------------------------------------------------------- */
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05];
-    @apply px-3 py-1 text-xs font-medium tracking-wide text-muted-foreground backdrop-blur-md;
+    @apply inline-flex items-center gap-2 rounded-full border border-primary/25 bg-white/70;
+    @apply px-4 py-1.5 text-xs font-semibold tracking-wide text-primary backdrop-blur-md;
   }
+  .dark .eyebrow { @apply border-white/10 bg-white/[0.05] text-muted-foreground; }
   .num {
     font-variant-numeric: tabular-nums;
   }
@@ -288,4 +293,50 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---- Reading page helpers (ported from the D:/test interpreter UI) ---- */
+@layer utilities {
+  .font-display { font-family: 'Vazirmatn', Tahoma, system-ui, sans-serif; }
+  .text-gradient-gold,
+  .text-gradient-cosmic {
+    background-image: linear-gradient(135deg, #c8102e, #7f0a1d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glass-strong {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border));
+  }
+  .ring-gold { box-shadow: 0 0 0 1px rgb(245 158 11 / 0.35); }
+  .persian-nums { font-feature-settings: 'ss01'; }
+}
+
+/* ---- AstroBinesh decorations: sparkles, orbit lines, beads -------------- */
+@layer components {
+  .vedic-gradient {
+    background-image: linear-gradient(180deg, #dc2640 0%, #b30d27 55%, #8f0a1f 100%);
+    box-shadow: 0 10px 24px -12px hsl(350 86% 41% / 0.75), 0 1px 0 hsl(0 0% 100% / 0.3) inset;
+  }
+  .sparkle {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: linear-gradient(135deg, #ff6b7d, #c8102e);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  }
+  .bead {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 30% 30%, #ff8a98, #c8102e 55%, #7f0a1d);
+    box-shadow: 0 4px 10px -2px hsl(350 86% 41% / 0.55);
+  }
+  .light-only { display: block; }
+  .dark-only { display: none; }
+  .dark .light-only { display: none; }
+  .dark .dark-only { display: block; }
 }

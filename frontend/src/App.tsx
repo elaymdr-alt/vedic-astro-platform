@@ -10,6 +10,7 @@ import Settings from './pages/Settings'
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import Profile from './pages/Profile'
+import Reading from './pages/Reading'
 import { computeChart, PLANET_FA, type ChartResult } from './api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -34,6 +35,7 @@ function HomePage() {
         hour: b.hour,
         minute: b.minute,
         tz_offset: b.tz_offset,
+        tz: b.tz,
         lat: b.lat,
         lon: b.lon,
       })
@@ -106,7 +108,7 @@ function HomePage() {
               </p>
 
               {!chart.ascendant ? (
-                <p className="rounded-xl border border-gold-500/25 bg-gold-500/10 p-4 text-sm text-gold-200">
+                <p className="rounded-xl border border-gold-500/25 bg-gold-500/10 p-4 text-sm text-brand-700 dark:text-gold-200">
                   ساعت تولد نامعلوم است — طالع و خانه‌ها بدون مبنای معتبر تولد محاسبه نمی‌شوند.
                 </p>
               ) : (
@@ -208,6 +210,7 @@ export default function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/reading" element={<Reading />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />

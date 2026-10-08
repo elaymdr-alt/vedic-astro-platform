@@ -18,6 +18,8 @@ export interface ChartResult {
   reference_time: string | null;
   /** null when time_precision === 'unknown' (P05-T05) */
   ascendant: Ascendant | null;
+  /** Sidereal Midheaven; null when time_precision === 'unknown' */
+  midheaven: { longitude: number; sign_index: number } | null;
   planets: Planet[];
   houses_whole_sign: House[] | null;
   moon_nakshatra: { index: number; name: string; pada: number; lord: string } | null;
@@ -53,5 +55,5 @@ export async function searchCities(q: string) {
   const r = await fetch(`${API}/cities?q=${encodeURIComponent(q)}`);
   if (!r.ok) throw new Error('خطا در جست‌وجوی شهر');
   const j = await r.json();
-  return j.items as { name_fa: string; name_en: string; lat: number; lon: number; tz_offset: number }[];
+  return j.items as { name_fa: string; name_en: string; lat: number; lon: number; tz_offset: number; tz?: string }[];
 }

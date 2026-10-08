@@ -64,7 +64,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 bg-gold-500/15 text-gold-200 ring-1 ring-gold-400/30">
+          <Badge variant="secondary" className="mb-4 bg-gold-500/15 text-brand-700 dark:text-gold-200 ring-1 ring-gold-400/30">
             بسته‌های اشتراکی
           </Badge>
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl vedic-text-gradient mb-4">

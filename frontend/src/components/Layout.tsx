@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useTheme } from 'next-themes'
 import CosmicBackground from './CosmicBackground'
+import OrbitDecor from './OrbitDecor'
 
 interface NavItem {
   to: string
@@ -61,10 +62,12 @@ function ThemeToggle() {
 
 export function BrandMark() {
   return (
-    <span className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md transition-transform duration-500 group-hover:scale-110">
-      <Sparkles className="h-5 w-5 text-gold-400" aria-hidden="true" />
-      <span className="absolute inset-0 rounded-xl bg-brand-500/20 blur-lg transition-opacity duration-500 group-hover:opacity-0" />
-    </span>
+    <img
+      src="/logo-mark.png"
+      alt=""
+      aria-hidden="true"
+      className="h-11 w-auto transition-transform duration-500 group-hover:scale-110"
+    />
   )
 }
 
@@ -86,7 +89,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative flex min-h-dvh flex-col" dir="rtl">
-      <CosmicBackground intensity="medium" showNebula showOrbs showGrid />
+      <CosmicBackground className="dark-only" intensity="medium" showNebula showOrbs showGrid />
+      <OrbitDecor />
       
       {/* ------------------------------------------------------------- Header */}
       <header
@@ -101,8 +105,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Link to="/" className="group flex shrink-0 items-center gap-3">
             <BrandMark />
             <span className="hidden sm:block">
-              <span className="vedic-text-gradient block text-base font-extrabold leading-tight">
-                طالع‌بینی ودیک
+              <span className="vedic-text-gradient block text-lg font-extrabold leading-tight" dir="ltr">
+                AstroBinesh
               </span>
               <span className="block text-[11px] font-light leading-tight text-muted-foreground">
                 آیانامشای لاهیری • Whole Sign
@@ -168,6 +172,10 @@ export default function Layout({ children }: { children: ReactNode }) {
               className="vedic-gradient hidden shadow-lg shadow-brand-950/40 transition-all duration-300 hover:brightness-110 sm:inline-flex"
             >
               <Link to="/">محاسبه چارت</Link>
+            </Button>
+
+            <Button size="sm" variant="outline" asChild className="hidden xl:inline-flex">
+              <Link to="/reading">تفسیر چارت</Link>
             </Button>
 
             <Button

@@ -1,5 +1,5 @@
 {
-  "name": "vedic-astro-platform",
+  "name": "astrobinesh",
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",

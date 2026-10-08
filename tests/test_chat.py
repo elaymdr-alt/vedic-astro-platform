@@ -222,3 +222,12 @@ def test_chart_context_is_positively_framed(fake):
     assert r.status_code == 200
     ctx = " ".join(m["content"] for m in fake.calls[0]["body"]["messages"])
     assert "نقاط قوت و فرصت‌های چارت" in ctx and "محتاط" not in ctx
+
+
+def test_invented_reference_footnotes_are_removed():
+    text = "ماه در دلو است [A1]. یک نفس عمیق بکش.\n\n[A1]: ماه در دلو نشان‌دهنده تعلق است.\n[J2]: توضیح ساختگی"
+    out, dropped = sanitize(text)
+    assert "[A1]:" not in out and "[J2]:" not in out and "[A1]" in out and dropped == 2
+    g = StreamGuard()
+    streamed = g.feed("خوب است [J1].\n[J1]: ساختگی.\nپایان.") + g.flush()
+    assert "[J1]:" not in streamed and "پایان." in streamed

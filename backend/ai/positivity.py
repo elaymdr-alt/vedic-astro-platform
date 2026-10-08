@@ -26,10 +26,14 @@ BANNED = [
     "terrible", "doomed", "hopeless", "worthless", "your fault", "bad luck", "disaster",
 ]
 _NORM = [normalize(b) for b in BANNED]
-_SPLIT = re.compile(r"(?<=[\.\!\?؟؛:\n])")
+_SPLIT = re.compile(r"(?<=[\.\!\?؟؛\n])")
+# models sometimes append an invented "[A1]: ..." reference list; sources are shown by the UI instead
+_FOOTNOTE = re.compile(r"^\s*\[[AJ]\d+\]\s*[:：]")
 
 
 def is_clean(sentence: str) -> bool:
+    if _FOOTNOTE.match(sentence):
+        return False
     s = normalize(sentence)
     return not any(b in s for b in _NORM)
 

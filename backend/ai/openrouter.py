@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import AsyncIterator
 
 import httpx
@@ -36,6 +37,22 @@ class Settings:
     base_url: str
     referer: str
     title: str
+
+
+def _load_dotenv() -> None:
+    """Load KEY=VALUE pairs from the project-root ``.env`` (git-ignored); real env wins."""
+    path = Path(__file__).resolve().parents[2] / ".env"
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+    except OSError:
+        pass
+
+
+_load_dotenv()
 
 
 def settings() -> Settings:

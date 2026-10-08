@@ -104,7 +104,12 @@ class Report(Base):
     result_url = Column(Text)
     error_message = Column(Text)
     job_id = Column(String(120), index=True)
+    result_json = Column(Text)
+    idempotency_key = Column(String(120))
+    attempts = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
 
     profile = relationship("BirthProfile", back_populates="reports")
+
+    __table_args__ = (UniqueConstraint("profile_id", "idempotency_key", name="uq_report_idem"),)

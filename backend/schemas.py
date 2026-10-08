@@ -130,3 +130,15 @@ class RectifyIn(BaseModel):
     events: list[RectifyEventIn] = Field(..., min_length=1, max_length=14)
     step_minutes: int = Field(4, ge=1, le=15)
     permutations: int = Field(60, ge=0, le=200)
+
+
+class DailyIn(BaseModel):
+    """Practical daily guidance for one person (panchang + personal gochara + dasha)."""
+    birth: BirthInput
+    date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$",
+                             description="Gregorian ISO date; default: today at the place")
+    days: int = Field(14, ge=1, le=30)
+    lat: float | None = Field(None, ge=-90, le=90, description="current place; default: birth place")
+    lon: float | None = Field(None, ge=-180, le=180)
+    tz: str | None = None
+    tz_offset: float | None = Field(None, ge=-12, le=14)

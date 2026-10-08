@@ -20,11 +20,12 @@ from engine.synastry import synastry as synastry_of  # noqa: E402
 from engine.timezone import TimezoneError, local_to_utc  # noqa: E402
 from engine.transit import transit_scan  # noqa: E402
 from engine import rectify as rect  # noqa: E402
+from engine.daily import build_daily  # noqa: E402
 from backend.cities import search_cities  # noqa: E402
 from backend.database import init_db  # noqa: E402
 from backend.routes import router as api_router  # noqa: E402
 from backend.schemas import (  # noqa: E402
-    BirthInput, CalendarConvertIn, RectifyIn, SynastryInput, TimezoneConvertIn,
+    BirthInput, CalendarConvertIn, DailyIn, RectifyIn, SynastryInput, TimezoneConvertIn,
     TransitScanInput,
 )
 
@@ -231,3 +232,34 @@ def rectify_birth_time(body: RectifyIn) -> dict:
     except EphemerisUnavailable as exc:
         raise HTTPException(status_code=503, detail={
             "code": "EPHEMERIS_UNAVAILABLE", "message": str(exc)})
+
+
+@app.post("/daily")
+def daily_guidance(body: DailyIn) -> dict:
+    """Panchang, time windows, personal gochara, running dasha and a ≤30-day outlook."""
+    from datetime import date as _date, datetime as _dt, timedelta as _td, timezone as _tz
+    natal = _build_chart(body.birth)
+    lat = body.lat if body.lat is not None else body.birth.lat
+    lon = body.lon if body.lon is not None else body.birth.lon
+    tz_offset = body.tz_offset if body.tz_offset is not None else body.birth.tz_offset
+    if body.tz:
+        try:
+            probe = _dt.now(_tz.utc)
+            tz_offset = local_to_utc(probe.year, probe.month, probe.day, 12, 0, body.tz,
+                                     fold=0).utc_offset_hours
+        except TimezoneError as exc:
+            raise HTTPException(status_code=422, detail={
+                "code": exc.code, "message": exc.message, "details": exc.details or {}})
+    try:
+        day = _date.fromisoformat(body.date) if body.date else \
+            (_dt.now(_tz.utc) + _td(hours=tz_offset)).date()
+    except ValueError:
+        raise HTTPException(status_code=422, detail={
+            "code": "INVALID_DATE", "message": "تاریخ نامعتبر است"})
+    try:
+        return build_daily(natal, day, tz_offset, lat, lon, body.days)
+    except EphemerisUnavailable as exc:
+        raise HTTPException(status_code=503, detail={
+            "code": "EPHEMERIS_UNAVAILABLE", "message": str(exc)})
+    except ValueError as exc:  # e.g. polar day/night: no sunrise
+        raise HTTPException(status_code=422, detail={"code": "NO_SUNRISE", "message": str(exc)})

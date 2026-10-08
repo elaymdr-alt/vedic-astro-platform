@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+from contextlib import asynccontextmanager
 from datetime import timezone
 from pathlib import Path
 
@@ -14,16 +15,25 @@ from engine import compute_chart, interpret_chart  # noqa: E402
 from engine.calendar import (  # noqa: E402
     gregorian_to_jalali, is_valid_jalali, jalali_to_gregorian,
 )
+from engine.ephemeris import EphemerisUnavailable  # noqa: E402
 from engine.synastry import synastry as synastry_of  # noqa: E402
 from engine.timezone import TimezoneError, local_to_utc  # noqa: E402
 from engine.transit import transit_scan  # noqa: E402
 from backend.cities import search_cities  # noqa: E402
+from backend.database import init_db  # noqa: E402
+from backend.routes import router as api_router  # noqa: E402
 from backend.schemas import (  # noqa: E402
     BirthInput, CalendarConvertIn, SynastryInput, TimezoneConvertIn,
     TransitScanInput,
 )
 
-app = FastAPI(title="Vedic Astro API", version="0.1.0")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="AstroBinesh API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +41,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(api_router)
 
 
 @app.get("/health")
@@ -70,13 +83,30 @@ def _build_chart(body: BirthInput) -> dict:
             raise HTTPException(status_code=422, detail={
                 "code": "INVALID_JALALI", "message": "تاریخ شمسی نامعتبر است (مثل ۳۰ اسفند سال غیرکبیسه)"})
         gy, gm, gd = jalali_to_gregorian(body.year, body.month, body.day)
+    tz_offset = body.tz_offset
+    if body.tz:
+        # Historical/DST-aware offset from tzdb; ambiguous or non-existent local
+        # times stop here and never reach the engine (P05 acceptance).
+        try:
+            tz_offset = local_to_utc(
+                gy, gm, gd, body.hour, body.minute, body.tz, fold=body.fold,
+            ).utc_offset_hours
+        except TimezoneError as exc:
+            raise HTTPException(status_code=422, detail={
+                "code": exc.code, "message": exc.message, "details": exc.details or {}})
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail={
+                "code": "INVALID_DATE", "message": str(exc)})
     try:
         return compute_chart(
             year=gy, month=gm, day=gd,
             hour_local=body.hour + body.minute / 60.0,
-            tz_offset=body.tz_offset, lat=body.lat, lon=body.lon,
-            time_precision=body.time_precision,
+            tz_offset=tz_offset, lat=body.lat, lon=body.lon,
+            time_precision=body.time_precision, node=body.node,
         )
+    except EphemerisUnavailable as exc:
+        raise HTTPException(status_code=503, detail={
+            "code": "EPHEMERIS_UNAVAILABLE", "message": str(exc)})
     except Exception as exc:
         raise HTTPException(status_code=500, detail={
             "code": "ENGINE_FAILED", "message": str(exc)})

@@ -1,4 +1,4 @@
-"""Database CRUD operations for the Vedic Astro platform."""
+"""Database CRUD operations for the AstroBinesh platform."""
 from __future__ import annotations
 
 from typing import List, Optional
@@ -6,7 +6,7 @@ from typing import List, Optional
 import bcrypt
 from sqlalchemy.orm import Session
 
-from models import User, BirthProfile, ProfileShare, Calculation, Report
+from backend.models import User, BirthProfile, ProfileShare, Calculation, Report
 
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
@@ -126,8 +126,8 @@ def get_calculations(db: Session, profile_id: int) -> List[Calculation]:
 def create_calculation(
     db: Session,
     profile_id: int,
-    chart_type: str = "D1",
     result_json: str,
+    chart_type: str = "D1",
     engine_version: str = "swisseph",
 ) -> Calculation:
     calc = Calculation(

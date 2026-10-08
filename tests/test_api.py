@@ -142,8 +142,8 @@ def test_interpret_endpoint():
     r = client.post("/chart/interpret", json=_birth(1990, 6, 15))
     assert r.status_code == 200
     rep = r.json()["report"]
-    assert rep["rules_version"] == "1.0.0"
-    assert rep["report_version"] == "1.0.0"
+    assert rep["rules_version"] == "1.1.0"
+    assert rep["report_version"] == "1.1.0"
     assert rep["settings"]["ayanamsa"] == "lahiri"
     assert len(rep["paragraphs"]) > 0
     assert all(p["evidence"] and p["rules_version"] for p in rep["paragraphs"])
@@ -158,3 +158,25 @@ def test_interpret_endpoint_unknown_time():
     assert rep["time_precision"] == "unknown"
     assert any(l["code"] == "TIME_SENSITIVE_RULES_SKIPPED" for l in rep["limitations"])
 
+
+
+def test_chart_uses_tzdb_offset_when_tz_given():
+    from fastapi.testclient import TestClient
+    from backend.main import app
+    c = TestClient(app)
+    base = dict(calendar="gregorian", year=1993, month=7, day=1, hour=12, minute=0,
+                tz_offset=3.5, lat=35.69, lon=51.39)
+    legacy = c.post("/chart/compute", json=base).json()["chart"]["julian_day_ut"]
+    tzd = c.post("/chart/compute", json={**base, "tz": "Asia/Tehran"})
+    assert tzd.status_code == 200
+    # Tehran observed DST (+4:30) on 1993-07-01, so the instant is 1h earlier.
+    assert abs((legacy - tzd.json()["chart"]["julian_day_ut"]) - 1 / 24) < 1e-4
+
+
+def test_chart_rejects_nonexistent_local_time():
+    from fastapi.testclient import TestClient
+    from backend.main import app
+    r = TestClient(app).post("/chart/compute", json=dict(
+        calendar="gregorian", year=2023, month=3, day=12, hour=2, minute=30,
+        tz_offset=-5, lat=40.7, lon=-74.0, tz="America/New_York"))
+    assert r.status_code == 422 and r.json()["detail"]["code"] == "NON_EXISTENT_LOCAL_TIME"

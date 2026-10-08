@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the Vedic Astro platform."""
+"""SQLAlchemy models for the AstroBinesh platform."""
 from __future__ import annotations
 
 from datetime import datetime
@@ -18,7 +18,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from database import Base
+from backend.database import Base
 
 
 class User(Base):

@@ -1,7 +1,9 @@
 """Authentication and authorization utilities."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+import os
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import bcrypt
@@ -10,10 +12,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from database import get_db
-from models import User
+from backend.database import get_db
+from backend.models import BirthProfile, ProfileShare, User
 
-SECRET_KEY = "vedic-astro-secret-key-change-in-production"
+# Set JWT_SECRET_KEY in production. Without it a random per-process key is used
+# (safe, but every restart invalidates existing tokens).
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or secrets.token_urlsafe(48)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
@@ -30,7 +34,9 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    if "sub" in to_encode:
+        to_encode["sub"] = str(to_encode["sub"])  # PyJWT requires a string subject
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -38,7 +44,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 def decode_access_token(token: str) -> Optional[dict]:
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except jwt.JWTError:
+    except jwt.PyJWTError:
         return None
 
 
@@ -49,15 +55,17 @@ def get_current_user(
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception
-    user_id: int = payload.get("sub")
-    if user_id is None:
+    try:
+        user_id = int(payload.get("sub"))
+    except (TypeError, ValueError):
         raise credentials_exception
     user = db.query(User).filter(User.id == user_id).first()
-    if user is None:
+    if user is None or not user.is_active:
         raise credentials_exception
     return user
 
@@ -73,15 +81,22 @@ def require_role(*roles: str):
     return decorator
 
 
-def check_profile_ownership(db: Session, profile_id: int, user_id: int) -> bool:
-    from models import BirthProfile, ProfileShare
+def get_profile_for_user(db: Session, profile_id: int, user: User, write: bool = False) -> BirthProfile:
+    """Return the profile if ``user`` owns it (or holds a sufficient share).
+
+    Missing and forbidden both raise 404 so profile ids cannot be probed.
+    """
+    not_found = HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
     profile = db.query(BirthProfile).filter(BirthProfile.id == profile_id).first()
     if not profile:
-        return False
-    if profile.owner_id == user_id:
-        return True
+        raise not_found
+    if profile.owner_id == user.id:
+        return profile
     share = db.query(ProfileShare).filter(
         ProfileShare.profile_id == profile_id,
-        ProfileShare.shared_with_user_id == user_id,
+        ProfileShare.shared_with_user_id == user.id,
     ).first()
-    return share is not None
+    allowed = ("edit", "admin") if write else ("view", "edit", "admin")
+    if share is None or share.permission not in allowed:
+        raise not_found
+    return profile

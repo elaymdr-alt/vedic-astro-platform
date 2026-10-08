@@ -16,6 +16,11 @@ class BirthInput(BaseModel):
     tz_offset: float = Field(..., ge=-12, le=14, description="e.g. 3.5 for Asia/Tehran")
     lat: float = Field(..., ge=-90, le=90)
     lon: float = Field(..., ge=-180, le=180)
+    node: Literal["mean", "true"] = Field("mean", description="Rahu/Ketu: mean or true node")
+    tz: str | None = Field(
+        None, description="IANA zone (e.g. Asia/Tehran). When given, the UTC offset is derived "
+                          "from tzdb for the birth date and `tz_offset` is ignored.")
+    fold: int | None = Field(None, ge=0, le=1, description="resolves a repeated local hour")
     time_precision: Literal["exact", "approximate", "unknown"] = Field(
         default="exact", description="P05-T05: unknown omits time-sensitive outputs")
 
@@ -55,3 +60,44 @@ class ErrorBody(BaseModel):
     code: str
     message: str
     details: dict | None = None
+
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=3, max_length=80)
+    email: str = Field(..., max_length=255, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    password: str = Field(..., min_length=8, max_length=128)
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: str
+    role: str
+
+    model_config = {"from_attributes": True}
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class ProfileIn(BaseModel):
+    display_name: str = Field(..., min_length=1, max_length=120)
+    calendar: Literal["jalali", "gregorian"] = "jalali"
+    year: int = Field(..., ge=1200, le=2100)
+    month: int = Field(..., ge=1, le=12)
+    day: int = Field(..., ge=1, le=31)
+    hour: int = Field(0, ge=0, le=23)
+    minute: int = Field(0, ge=0, le=59)
+    tz_offset: float = Field(..., ge=-12, le=14)
+    lat: float = Field(..., ge=-90, le=90)
+    lon: float = Field(..., ge=-180, le=180)
+    time_precision: Literal["exact", "approximate", "unknown"] = "exact"
+
+
+class ProfileOut(ProfileIn):
+    id: int
+    owner_id: int
+
+    model_config = {"from_attributes": True}

@@ -26,7 +26,8 @@ ReactDOM.createRoot(rootElement).render(
     <ErrorBoundary>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="dark"
+        forcedTheme="dark"
         enableSystem={false}
         disableTransitionOnChange
       >

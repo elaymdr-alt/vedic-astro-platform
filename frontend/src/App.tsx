@@ -3,6 +3,7 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { Compass, Home, Sparkles } from 'lucide-react'
 import Layout from './components/Layout'
 import BirthForm, { type BirthState } from './components/BirthForm'
+import CelestialWheel from './components/CelestialWheel'
 import NorthChart, { type ChartMode } from './components/NorthChart'
 import Dashboard from './pages/Dashboard'
 import Pricing from './pages/Pricing'
@@ -96,10 +97,8 @@ function HomePage() {
           </header>
 
           {!chart && !error && (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-white/[0.04]">
-                <Compass className="h-7 w-7 text-brand-400/60" aria-hidden="true" />
-              </div>
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <CelestialWheel className="mb-4 w-full max-w-sm" />
               <p className="text-sm text-muted-foreground">
                 مشخصات تولد را وارد و «محاسبه چارت» را بزنید.
               </p>

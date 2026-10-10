@@ -57,8 +57,8 @@ export function ChapterDivider({ label }: { label?: string }) {
     <div className="flex items-center gap-4" aria-hidden={!label}>
       <span className="from-primary/0 via-primary/40 h-px flex-1 bg-gradient-to-r" />
       {label && (
-        <span className="text-primary/70 text-xs font-semibold tracking-[0.2em]">
-          {label}
+        <span className="text-primary text-xs font-semibold">
+          ✦ {label} ✦
         </span>
       )}
       <span className="via-primary/40 from-primary/0 h-px flex-1 bg-gradient-to-l" />

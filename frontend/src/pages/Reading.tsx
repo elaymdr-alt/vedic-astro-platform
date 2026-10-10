@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ScrollText, Sparkles } from "lucide-react"
+import CelestialWheel from "@/components/CelestialWheel"
 import BirthForm, { type BirthState } from "@/components/BirthForm"
 import { ChapterPills } from "@/components/reading/chapter-pills"
 import {
@@ -104,10 +105,9 @@ function ReadingView({
     <>
       <main className="flex-1">
         {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <section className="container mx-auto max-w-4xl px-4 pt-14 pb-6 text-center">
-          <p className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
-            reading · تفسیر کامل چارت
-          </p>
+        <section className="relative container mx-auto max-w-4xl px-4 pt-14 pb-6 text-center">
+          <CelestialWheel className="absolute top-2 left-1/2 -z-10 w-[34rem] max-w-none -translate-x-1/2 opacity-40" />
+          <p className="text-primary text-sm font-semibold">تفسیر کامل چارت</p>
           <h1 className="font-display mt-5 text-4xl leading-[1.35] font-extrabold sm:text-5xl">
             {profile.name ?? "دوست عزیز"}،{" "}
             <span className="text-gradient-gold">این است روایت آسمان تو</span>

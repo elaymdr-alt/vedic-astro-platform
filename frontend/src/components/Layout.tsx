@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   Menu,
   Sparkles,
-  Star,
   User,
   Wallet,
   X,
@@ -21,9 +20,6 @@ import { cn } from '@/lib/utils'
 import { getToken, logout, onAuthChange } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useTheme } from 'next-themes'
-import CosmicBackground from './CosmicBackground'
-import OrbitDecor from './OrbitDecor'
 
 interface NavItem {
   to: string
@@ -39,33 +35,6 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/chat', label: 'گفت‌وگو', icon: MessageCircle },
   { to: '/psyche', label: 'روان‌شناسی', icon: Brain },
 ]
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  const isDark = mounted ? theme !== 'light' : true
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label={isDark ? 'فعال‌کردن حالت روشن' : 'فعال‌کردن حالت تاریک'}
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="text-muted-foreground transition-all duration-300 hover:text-brand-300 hover:bg-brand-500/10"
-    >
-      <Star
-        className={cn(
-          'h-[1.15rem] w-[1.15rem] transition-all duration-500',
-          isDark ? 'rotate-0 scale-100' : '-rotate-90 scale-75',
-        )}
-        aria-hidden="true"
-      />
-    </Button>
-  )
-}
 
 export function BrandMark() {
   return (
@@ -97,10 +66,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <div className="relative flex min-h-dvh flex-col" dir="rtl">
-      <CosmicBackground className="dark-only" intensity="medium" showNebula showOrbs showGrid />
-      <OrbitDecor />
-      
+    <div className="celestial flex min-h-dvh flex-col" dir="rtl">
       {/* ------------------------------------------------------------- Header */}
       <header
         className={cn(
@@ -154,14 +120,12 @@ export default function Layout({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="flex shrink-0 items-center gap-1">
-            <ThemeToggle />
-
             {loggedIn ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={logout}
-                className="hidden text-muted-foreground transition-all duration-200 hover:text-brand-700 sm:inline-flex"
+                className="hidden text-muted-foreground transition-all duration-200 hover:text-primary sm:inline-flex"
               >
                 <LogIn className="ml-2 h-4 w-4" aria-hidden="true" />
                 خروج
@@ -171,7 +135,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="hidden text-muted-foreground transition-all duration-200 hover:text-brand-700 sm:inline-flex"
+                className="hidden text-muted-foreground transition-all duration-200 hover:text-primary sm:inline-flex"
               >
                 <Link to="/auth">
                   <LogIn className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -183,7 +147,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <Button
               size="sm"
               asChild
-              className="vedic-gradient hidden shadow-lg shadow-brand-950/40 transition-all duration-300 hover:brightness-110 sm:inline-flex"
+              className="vedic-gradient hidden transition-all duration-300 hover:brightness-110 sm:inline-flex"
             >
               <Link to="/">محاسبه چارت</Link>
             </Button>
@@ -247,6 +211,11 @@ export default function Layout({ children }: { children: ReactNode }) {
       <footer className="relative z-10 mt-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Separator className="vedic-divider" />
+          <div className="flex items-center justify-center gap-3 pt-8 text-primary/70" aria-hidden="true">
+            <span className="h-px w-16 bg-gradient-to-l from-primary/50 to-transparent" />
+            <span>✦</span>
+            <span className="h-px w-16 bg-gradient-to-r from-primary/50 to-transparent" />
+          </div>
           <div className="flex flex-col items-center justify-between gap-4 py-8 text-center sm:flex-row sm:text-right">
             <div>
               <p className="vedic-text-gradient text-sm font-bold">طالع‌بینی ودیک</p>

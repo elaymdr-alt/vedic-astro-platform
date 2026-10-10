@@ -252,6 +252,151 @@
   .dark .dark-only { display: block; }
 }
 
+/* ==========================================================================
+   "Celestial" scope — luminous night-sky look for chart + reading pages.
+   Wrap a page in <div className="celestial">; every shadcn token inside is
+   re-pointed to deep indigo, star-gold, violet and cyan, in any app theme.
+   ========================================================================== */
+:root, .light, .dark, .celestial {
+  --background: 234 58% 6%;
+  --foreground: 42 45% 94%;
+  --card: 236 48% 10%;
+  --card-foreground: 42 45% 94%;
+  --popover: 236 48% 9%;
+  --popover-foreground: 42 45% 94%;
+  --primary: 43 92% 64%;
+  --primary-foreground: 234 58% 8%;
+  --secondary: 245 38% 17%;
+  --secondary-foreground: 42 45% 94%;
+  --muted: 240 36% 14%;
+  --muted-foreground: 232 24% 74%;
+  --accent: 266 48% 22%;
+  --accent-foreground: 42 85% 86%;
+  --border: 245 34% 24%;
+  --input: 245 34% 26%;
+  --ring: 43 92% 64%;
+  --sun: 43 95% 62%;
+  --sun-soft: 43 40% 18%;
+  --lavender: 266 40% 20%;
+  --shadow-color: 0 0% 0%;
+  --brand-400: 43 92% 64%;
+  --brand-500: 43 90% 56%;
+  --gold-400: 43 92% 64%;
+  --gold-500: 38 90% 56%;
+  --cx-violet: 268 88% 68%;
+  --cx-cyan: 190 92% 64%;
+  --cx-magenta: 320 82% 64%;
+
+  color-scheme: dark;
+}
+.celestial {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(58rem 34rem at 82% -8%, hsl(268 85% 42% / 0.5), transparent 62%),
+    radial-gradient(48rem 30rem at -6% 28%, hsl(214 90% 42% / 0.38), transparent 62%),
+    radial-gradient(44rem 28rem at 62% 108%, hsl(320 75% 42% / 0.28), transparent 64%),
+    hsl(var(--background));
+}
+/* two drifting star layers, pure CSS */
+.celestial::before,
+.celestial::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.celestial::before {
+  background-image:
+    radial-gradient(1.2px 1.2px at 22px 38px, hsl(0 0% 100% / 0.9), transparent 60%),
+    radial-gradient(1px 1px at 96px 120px, hsl(42 80% 88% / 0.75), transparent 60%),
+    radial-gradient(1.6px 1.6px at 170px 64px, hsl(190 90% 85% / 0.8), transparent 60%),
+    radial-gradient(1px 1px at 140px 176px, hsl(0 0% 100% / 0.6), transparent 60%);
+  background-size: 210px 210px;
+  opacity: 0.7;
+}
+.celestial::after {
+  background-image:
+    radial-gradient(1px 1px at 60px 90px, hsl(0 0% 100% / 0.7), transparent 60%),
+    radial-gradient(2px 2px at 250px 200px, hsl(43 95% 80% / 0.85), transparent 60%),
+    radial-gradient(1px 1px at 310px 40px, hsl(268 90% 88% / 0.8), transparent 60%);
+  background-size: 340px 340px;
+  opacity: 0.55;
+  animation: cx-twinkle 7s ease-in-out infinite alternate;
+}
+@keyframes cx-twinkle { from { opacity: 0.25 } to { opacity: 0.7 } }
+@keyframes cx-spin { to { transform: rotate(360deg) } }
+@keyframes cx-spin-rev { to { transform: rotate(-360deg) } }
+@keyframes cx-pulse { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
+
+/* glass panels with a gold-violet hairline */
+.celestial .glass,
+.celestial .vedic-card,
+.celestial .glass-strong,
+.celestial .chat-panel {
+  background: linear-gradient(160deg, hsl(238 46% 13% / 0.78), hsl(250 45% 9% / 0.7));
+  border: 1px solid hsl(var(--primary) / 0.16);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.06),
+    0 24px 60px -30px hsl(268 90% 50% / 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.celestial .vedic-card:hover,
+.celestial .glass:hover {
+  border-color: hsl(var(--primary) / 0.4);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.08),
+    0 0 0 1px hsl(var(--primary) / 0.12),
+    0 28px 64px -28px hsl(var(--cx-violet) / 0.7);
+}
+.celestial .ring-gold { box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 44px -12px hsl(var(--primary) / 0.45); }
+.celestial [data-slot='card'] {
+  background: linear-gradient(160deg, hsl(238 46% 13% / 0.78), hsl(250 45% 9% / 0.7));
+  border-color: hsl(var(--primary) / 0.16);
+}
+
+/* headline gradient: gold → rose → violet → cyan, like the nebula */
+.celestial .vedic-text-gradient,
+.celestial .text-gradient-gold,
+.celestial .text-gradient-cosmic {
+  background-image: linear-gradient(110deg, hsl(46 98% 78%) 0%, hsl(40 95% 64%) 32%, hsl(320 85% 74%) 66%, hsl(190 95% 74%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.celestial .vedic-gradient {
+  background-image: linear-gradient(135deg, hsl(46 95% 66%), hsl(34 92% 56%));
+  color: hsl(234 58% 8%);
+  box-shadow: 0 0 28px -6px hsl(var(--primary) / 0.65), inset 0 1px 0 hsl(0 0% 100% / 0.35);
+}
+.celestial .eyebrow {
+  border-color: hsl(var(--primary) / 0.3);
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(46 90% 80%);
+}
+.celestial .vedic-table thead th { background: hsl(240 40% 12% / 0.9); }
+.celestial .vedic-table tbody tr:hover { background: hsl(var(--cx-violet) / 0.12); }
+.celestial .vedic-field { background: hsl(240 40% 9% / 0.8); }
+
+/* soft colour glow behind banners (the decorative <div class="nebula">) */
+.nebula {
+  position: absolute;
+  z-index: 0;
+  border-radius: 9999px;
+  filter: blur(64px);
+  pointer-events: none;
+  background: radial-gradient(circle, hsl(var(--cx-violet) / 0.55), hsl(var(--primary) / 0.18) 60%, transparent 75%) !important;
+}
+
+/* orbiting wheel decoration */
+.cx-orbit { animation: cx-spin 140s linear infinite; transform-origin: center; transform-box: fill-box; }
+.cx-orbit-rev { animation: cx-spin-rev 90s linear infinite; transform-origin: center; transform-box: fill-box; }
+.cx-pulse { animation: cx-pulse 4.5s ease-in-out infinite; }
+
 @layer utilities {
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }

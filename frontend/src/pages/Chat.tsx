@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
-  Compass, Heart, HeartHandshake, MessageCircleHeart, Send, Sparkles, Square, Sprout, Sun, Wind,
+  Compass, Heart, HeartHandshake, Layers, MessageCircleHeart, Send, Sparkles, Square, Sprout, Sun, Wind,
 } from 'lucide-react'
 import BirthForm, { loadSavedBirth, type BirthState } from '@/components/BirthForm'
+import RichText from '@/components/RichText'
 import { cn } from '@/lib/utils'
 import { friendlyError } from '@/lib/net'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -17,6 +19,13 @@ interface Msg {
   sources?: Source[]
   crisis?: boolean
   error?: boolean
+}
+
+/** Reports saved by the «سه نگاه» page, attachable as chat context. */
+export interface SavedReports { generated_at: string; reports: { id: string; title: string; text: string }[] }
+export const REPORTS_STORE = 'ab_perspectives_v1'
+export function loadSavedReports(): SavedReports | null {
+  try { const raw = localStorage.getItem(REPORTS_STORE); return raw ? JSON.parse(raw) : null } catch { return null }
 }
 
 const STYLES: { id: StyleId; label: string; hint: string; icon: typeof Sun; starters: string[] }[] = [
@@ -40,31 +49,6 @@ const STYLES: { id: StyleId; label: string; hint: string; icon: typeof Sun; star
 
 const STORE = 'ab_chat_v1'
 
-/** Tiny safe renderer: **bold**, "- " bullets and numbered lines — React nodes only, no HTML injection. */
-function RichText({ text }: { text: string }) {
-  const inline = (s: string, k: string): ReactNode[] =>
-    s.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-      part.startsWith('**') && part.endsWith('**') && part.length > 4
-        ? <strong key={`${k}${i}`}>{part.slice(2, -2)}</strong>
-        : <span key={`${k}${i}`}>{part}</span>)
-  const blocks: ReactNode[] = []
-  let list: string[] = []
-  const flush = (k: number) => {
-    if (list.length) {
-      blocks.push(<ul key={`ul${k}`} className="my-2 list-disc space-y-1 pr-5">{list.map((l, i) => <li key={i}>{inline(l, `li${k}${i}`)}</li>)}</ul>)
-      list = []
-    }
-  }
-  text.split('\n').forEach((line, i) => {
-    const m = line.match(/^\s*(?:[-•*]|\d+[.)])\s+(.*)$/)
-    if (m) { list.push(m[1]); return }
-    flush(i)
-    if (line.trim()) blocks.push(<p key={`p${i}`} className="my-1.5">{inline(line, `p${i}`)}</p>)
-  })
-  flush(9999)
-  return <>{blocks}</>
-}
-
 function Breathing() {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-card/70 p-3 text-xs text-[hsl(var(--muted-foreground))]" aria-live="off">
@@ -84,11 +68,18 @@ export default function Chat() {
   const [birth, setBirth] = useState<BirthState | null>(() => loadSavedBirth())
   const [askBirth, setAskBirth] = useState(false)
   const [configured, setConfigured] = useState<boolean | null>(null)
+  const [saved, setSaved] = useState<SavedReports | null>(() => loadSavedReports())
+  const [withReports, setWithReports] = useState(false)
   const abort = useRef<AbortController | null>(null)
   const panelRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     fetch('/api/chat/status').then((r) => r.json()).then((j) => setConfigured(!!j.configured)).catch(() => setConfigured(null))
+  }, [])
+  useEffect(() => {
+    const sync = () => setSaved(loadSavedReports())
+    window.addEventListener('focus', sync)
+    return () => window.removeEventListener('focus', sync)
   }, [])
   useEffect(() => {
     try { localStorage.setItem(STORE, JSON.stringify(msgs.slice(-30))) } catch { /* storage blocked */ }
@@ -116,6 +107,9 @@ export default function Chat() {
         body: JSON.stringify({
           messages: history.filter((m) => !m.error).slice(-12).map(({ role, content: c }) => ({ role, content: c })),
           style, mode: 'auto',
+          reports: withReports && saved
+            ? saved.reports.filter((r) => r.text.trim()).map((r) => ({ label: r.title, text: r.text.slice(0, 6000) }))
+            : undefined,
           birth: birth ? {
             calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day, hour: birth.hour,
             minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, lat: birth.lat, lon: birth.lon,
@@ -242,6 +236,18 @@ export default function Chat() {
             </div>
           ))}
         </section>
+
+        {saved && saved.reports.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="زمینهٔ گزارش‌ها">
+            <button type="button" onClick={() => setWithReports((v) => !v)} aria-pressed={withReports}
+              className={cn('chat-chip flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs',
+                withReports && 'ring-1 ring-[hsl(var(--primary))]')}>
+              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+              {withReports ? 'سه گزارش ضمیمه است' : `سه گزارش در زمینه (${saved.reports.length})`}
+            </button>
+            <Link to="/perspectives" className="chat-chip rounded-full px-3.5 py-1.5 text-xs">صفحهٔ سه نگاه</Link>
+          </div>
+        )}
 
         <form onSubmit={(e) => { e.preventDefault(); void send(input) }}
           className="chat-panel flex items-end gap-2 rounded-3xl p-2.5">

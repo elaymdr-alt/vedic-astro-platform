@@ -133,3 +133,25 @@ export interface DailyResult {
 }
 
 export const daily = (payload: Record<string, unknown>) => post<DailyResult>('/daily', payload);
+
+/* ------------------------------------------------------------- perspectives */
+export interface PerspectiveLens { id: string; title: string; subtitle: string; agent: string }
+export interface PerspectiveReport extends PerspectiveLens {
+  text: string
+  sources: { ref: string; title: string; source: string; page: number | null; kind: string }[]
+  error: string | null
+}
+export interface PerspectivesResult {
+  generated_at: string
+  model: string
+  focus: string
+  reports: PerspectiveReport[]
+}
+
+export const perspectivesStatus = async (): Promise<{ configured: boolean; model: string; lenses: PerspectiveLens[] }> => {
+  const r = await fetch(`${API}/perspectives/status`)
+  if (!r.ok) throw new Error('خطا در وضعیت سه نگاه')
+  return r.json()
+}
+
+export const perspectives = (payload: Record<string, unknown>) => post<PerspectivesResult>('/perspectives', payload);

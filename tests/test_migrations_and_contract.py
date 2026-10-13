@@ -33,6 +33,7 @@ def test_openapi_contract_lists_public_api():
         "/profiles", "/profiles/{profile_id}", "/profiles/{profile_id}/reports", "/reports/{report_id}",
         "/reports/{report_id}/share", "/shared/{token}", "/me/export", "/me", "/chat", "/chat/stream",
         "/psyche/profile", "/psyche/quiz", "/psyche/quiz/score",
+        "/perspectives", "/perspectives/status",
     }
     assert required <= paths, sorted(required - paths)
     ids = [op["operationId"] for p in spec["paths"].values() for op in p.values()]

@@ -12,6 +12,7 @@ import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import Profile from './pages/Profile'
 import Reading from './pages/Reading'
+import Perspectives from './pages/Perspectives'
 import Rectify from './pages/Rectify'
 import Today from './pages/Today'
 import Chat from './pages/Chat'
@@ -215,6 +216,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/reading" element={<Reading />} />
+        <Route path="/perspectives" element={<Perspectives />} />
         <Route path="/today" element={<Today />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/psyche" element={<Psyche />} />

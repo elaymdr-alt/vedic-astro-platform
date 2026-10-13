@@ -3,6 +3,7 @@ import { searchCities } from '../api'
 import { authFetch, getToken, onAuthChange } from '../lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import ReportsPanel from '@/components/ReportsPanel'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -115,6 +116,7 @@ function ActivityItem({ action, time, type }: { action: string; time: string; ty
 export default function DashboardPage() {
   const [profiles, setProfiles] = useState<Profile[]>(loadProfiles())
   const [tab, setTab] = useState<'overview'|'charts'|'compare'>('overview')
+  const [reportsFor, setReportsFor] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [citySearch, setCitySearch] = useState('')
@@ -475,7 +477,13 @@ export default function DashboardPage() {
                           <td className="p-2">{p.birth.year}/{p.birth.month}/{p.birth.day}</td>
                           <td className="p-2">{String(p.birth.hour).padStart(2,'0')}:{String(p.birth.minute).padStart(2,'0')}</td>
                           <td className="p-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleDelete(p.id)}>حذف</Button>
+                            <div className="flex gap-1">
+                              {token && /^\d+$/.test(p.id) && (
+                                <Button variant="ghost" size="sm"
+                                  onClick={() => setReportsFor(reportsFor === p.id ? null : p.id)}>گزارش‌ها</Button>
+                              )}
+                              <Button variant="ghost" size="sm" onClick={() => handleDelete(p.id)}>حذف</Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -483,6 +491,14 @@ export default function DashboardPage() {
                   </table>
                 </div>
               )}
+              {reportsFor && /^\d+$/.test(reportsFor) && (() => {
+                const p = profiles.find((x) => x.id === reportsFor)
+                return p ? (
+                  <div className="mt-3">
+                    <ReportsPanel profileId={Number(p.id)} label={`${p.birth.cityLabel} ${p.birth.year}/${p.birth.month}/${p.birth.day}`} />
+                  </div>
+                ) : null
+              })()}
             </CardContent>
           </Card>
         </div>

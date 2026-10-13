@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from backend.ai import agents, openrouter, rag, typology
+from backend.ai import agents, openrouter, perspectives, rag, typology
 from backend.schemas import BirthInput
 from engine.psyche import psyche_profile
 
@@ -46,12 +46,19 @@ class ChatMessage(BaseModel):
     content: str = Field(..., min_length=1, max_length=4000)
 
 
+class ReportCtx(BaseModel):
+    """One three-lens report attached to a chat turn as reference context."""
+    label: str = Field("", max_length=80)
+    text: str = Field(..., max_length=6000)
+
+
 class ChatIn(BaseModel):
     messages: list[ChatMessage] = Field(..., min_length=1, max_length=40)
     birth: BirthInput | None = None
     mode: Literal["auto", "astro", "jung", "both"] = "auto"
     style: Literal["auto", "hope", "love", "nudge", "guide", "calm", "comfort", "heart"] = "auto"
     date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    reports: list[ReportCtx] | None = Field(None, max_length=3)
 
 
 def _turn(body: ChatIn) -> agents.Turn:
@@ -69,7 +76,8 @@ def _turn(body: ChatIn) -> agents.Turn:
     except ValueError:
         raise HTTPException(status_code=422, detail={"code": "INVALID_DATE", "message": "تاریخ نامعتبر"})
     return agents.Turn(messages=[m.model_dump() for m in body.messages], natal=natal, mode=body.mode, style=body.style,
-                       today=day, tz_offset=tz_offset, lat=lat, lon=lon)
+                       today=day, tz_offset=tz_offset, lat=lat, lon=lon,
+                       reports=[r.model_dump() for r in body.reports] if body.reports else None)
 
 
 def _no_key_http() -> HTTPException:
@@ -114,6 +122,37 @@ async def chat_stream(body: ChatIn, request: Request) -> StreamingResponse:
 
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+# -------------------------------------------------------------- three lenses
+class PerspectiveIn(BaseModel):
+    birth: BirthInput
+    focus: str = Field("", max_length=300)
+    date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+
+
+@router.get("/perspectives/status")
+def perspectives_status() -> dict:
+    s = openrouter.settings()
+    return {"configured": bool(s.api_key), "model": s.model,
+            "lenses": [{"id": l["id"], "title": l["title"], "subtitle": l["subtitle"], "agent": l["agent"]}
+                       for l in perspectives.LENSES]}
+
+
+@router.post("/perspectives")
+async def perspectives_generate(body: PerspectiveIn, request: Request) -> dict:
+    """Three agents, three astrology lenses, three reports — side by side."""
+    _guard(request)
+    if not openrouter.configured():
+        raise _no_key_http()
+    from backend.main import _build_chart  # late import: main includes this router
+    natal = _build_chart(body.birth)
+    try:
+        day = _date.fromisoformat(body.date) if body.date else _date.today()
+    except ValueError:
+        raise HTTPException(status_code=422, detail={"code": "INVALID_DATE", "message": "تاریخ نامعتبر"})
+    return await perspectives.generate(natal, day, body.birth.tz_offset, body.birth.lat, body.birth.lon,
+                                       focus=body.focus.strip())
 
 
 # ------------------------------------------------------------------- psyche

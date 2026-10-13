@@ -1,5 +1,6 @@
 """Subscription logic for AstroBinesh."""
 from backend.models import User
+from sqlalchemy.orm import Session
 
 def get_report_limit(user: User) -> int:
     """Returns daily report generation limit based on subscription status."""

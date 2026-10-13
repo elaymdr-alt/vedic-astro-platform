@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "api": "python -m uvicorn backend.main:app --port 8000",
+    "api": "python -m uvicorn backend.main:app --port 8030",
     "build": "npm --prefix frontend run build",
     "install": "npm --prefix frontend install"
   },

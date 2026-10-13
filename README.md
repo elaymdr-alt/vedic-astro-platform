@@ -48,13 +48,13 @@ astrobinesh/
 python -m pip install -r backend/requirements.txt
 
 # 2) Ejra-ye backend
-python -m uvicorn backend.main:app --reload --port 8000 --app-dir .
+python -m uvicorn backend.main:app --reload --port 8030 --app-dir .
 
 # 3) Ejra-ye frontend (terminal-e joda)
 cd frontend; npm install; npm run dev
 ```
 
-* Backend: http://localhost:8000 — docs: http://localhost:8000/docs
+* Backend: http://localhost:8030 — docs: http://localhost:8030/docs
 * Frontend: http://localhost:5173
 
 ## Gharardad-e mohasebati (az asnad-e proje)
@@ -134,7 +134,7 @@ export OPENROUTER_API_KEY=sk-or-...        # الزامی؛ هرگز در مخز
 export OPENROUTER_MODEL=anthropic/claude-sonnet-4.5   # اختیاری
 # کتاب‌های مرجع (PDF) را یک‌بار به نمایه محلی تبدیل کنید (git-ignored؛ متن کتاب منتشر نمی‌شود)
 python -m backend.ai.ingest "path/book_en.pdf" "path/book_fa.pdf"
-uvicorn backend.main:app --port 8000
+uvicorn backend.main:app --port 8030
 cd frontend && npm run dev
 ```
 

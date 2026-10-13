@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { ScrollText, Sparkles } from "lucide-react"
 import CelestialWheel from "@/components/CelestialWheel"
 import BirthForm, { type BirthState } from "@/components/BirthForm"
+import { AreaReports, type LifeAreasReport } from "@/components/reading/area-reports"
 import { ChapterPills } from "@/components/reading/chapter-pills"
 import {
   ContradictionCard,
@@ -34,7 +35,7 @@ import { ChapterDivider, SectionHeading } from "@/components/section-heading"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { computeChart } from "@/api"
+import { computeChart, lifeAreas } from "@/api"
 import { faNum, formatJalali, toPersianDigits } from "@/lib/astrology/format"
 import { buildIntelligence } from "@/lib/astrology/intelligence"
 import { buildAnalysis } from "@/lib/astrology/analysis-schema"
@@ -88,10 +89,12 @@ function ChapterProse({ items }: { items: string[] }) {
 function ReadingView({
   chart,
   profile,
+  areas,
   onReset,
 }: {
   chart: NatalChart
   profile: BirthProfile
+  areas: LifeAreasReport | null
   onReset: () => void
 }) {
   const doc = buildReading(chart)
@@ -155,6 +158,9 @@ function ReadingView({
             ))}
           </div>
         </section>
+
+        {/* ── Everyday life-area reports (six viewpoints) ──────────────── */}
+        {areas && <AreaReports report={areas} />}
 
         {/* ── Super Ultra Executive Summary ────────────────────────────── */}
         <section className="container mx-auto max-w-5xl px-4 pb-10">
@@ -546,7 +552,7 @@ function ReadingView({
 const pad = (n: number) => String(n).padStart(2, "0")
 
 export default function Reading() {
-  const [result, setResult] = useState<{ chart: NatalChart; profile: BirthProfile } | null>(null)
+  const [result, setResult] = useState<{ chart: NatalChart; profile: BirthProfile; areas: LifeAreasReport | null } | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -554,7 +560,7 @@ export default function Reading() {
     setLoading(true)
     setError("")
     try {
-      const r = await computeChart({
+      const payload = {
         calendar: "jalali",
         year: b.year,
         month: b.month,
@@ -562,10 +568,16 @@ export default function Reading() {
         hour: b.hour,
         minute: b.minute,
         tz_offset: b.tz_offset,
+        time_precision: b.timeKnown === false ? "unknown" : "exact",
         tz: b.tz,
         lat: b.lat,
         lon: b.lon,
-      })
+      }
+      // the area reports are an add-on: if they fail the main reading still shows
+      const [r, areas] = await Promise.all([
+        computeChart(payload),
+        lifeAreas(payload).catch(() => null),
+      ])
       const g = r.input_gregorian as { year: number; month: number; day: number }
       const timeKnown = r.chart.time_precision !== "unknown"
       const profile: BirthProfile = {
@@ -576,7 +588,7 @@ export default function Reading() {
         latitude: b.lat,
         longitude: b.lon,
       }
-      setResult({ chart: natalChartFromBackend(r.chart, profile), profile })
+      setResult({ chart: natalChartFromBackend(r.chart, profile), profile, areas })
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطای ناشناخته")
     } finally {
@@ -589,6 +601,7 @@ export default function Reading() {
       <ReadingView
         chart={result.chart}
         profile={result.profile}
+        areas={result.areas}
         onReset={() => setResult(null)}
       />
     )
@@ -598,7 +611,7 @@ export default function Reading() {
       <h1 className="vedic-text-gradient mb-6 text-center text-3xl font-extrabold">
         تفسیر کامل چارت
       </h1>
-      <BirthForm onSubmit={submit} loading={loading} />
+      <BirthForm onSubmit={submit} loading={loading} allowUnknownTime />
       {error && (
         <div role="alert" className="border-destructive/30 bg-destructive/10 text-destructive mt-4 rounded-2xl border px-4 py-3 text-sm">
           {error}

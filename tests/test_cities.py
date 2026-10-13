@@ -33,3 +33,11 @@ def test_cities_endpoint_and_chart_with_foreign_city_uses_its_tzdb_offset():
     naive = c.post("/chart/compute", json={**base, "tz_offset": -5}).json()["chart"]["julian_day_ut"]
     # New York was on EDT (UTC-4) on 1990-07-01, so tz-derived instant is 1h earlier than a fixed -5.
     assert abs((naive - summer) - 1 / 24) < 1e-4
+
+
+def test_display_name_is_clean_persian():
+    from backend.cities import search_cities
+    assert search_cities("mashhad")[0]["name_fa"] == "مشهد"
+    assert search_cities("karaj")[0]["name_fa"] == "کرج"
+    names = [c["name_fa"] for c in search_cities("", 14)]
+    assert "تهران" in names and all("َ" not in n for n in names)  # no diacritics

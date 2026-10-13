@@ -33,7 +33,7 @@ export default function Perspectives() {
       const r = await perspectives({
         birth: {
           calendar: b.calendar, year: b.year, month: b.month, day: b.day, hour: b.hour,
-          minute: b.minute, tz: b.tz, tz_offset: b.tz_offset, lat: b.lat, lon: b.lon,
+          minute: b.minute, tz: b.tz, tz_offset: b.tz_offset, time_precision: b.timeKnown === false ? 'unknown' : 'exact', lat: b.lat, lon: b.lon,
         },
         focus: focus.trim(),
       })

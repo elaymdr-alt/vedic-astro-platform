@@ -49,7 +49,7 @@ export default function Today() {
     daily({
       birth: {
         calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day,
-        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset,
+        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, time_precision: birth.timeKnown === false ? 'unknown' : 'exact',
         lat: birth.lat, lon: birth.lon,
       },
       days: 14,
@@ -65,7 +65,7 @@ export default function Today() {
     const r = await fetch('/api/daily/calendar.ics', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ birth: { calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day,
-        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, lat: birth.lat, lon: birth.lon }, days: 30 }),
+        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, time_precision: birth.timeKnown === false ? 'unknown' : 'exact', lat: birth.lat, lon: birth.lon }, days: 30 }),
     })
     if (!r.ok) { setError('ساخت فایل تقویم انجام نشد'); return }
     const url = URL.createObjectURL(await r.blob())

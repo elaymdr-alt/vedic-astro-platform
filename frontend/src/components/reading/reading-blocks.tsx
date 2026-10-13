@@ -134,7 +134,7 @@ export function MedallionCard({ m }: { m: Medallion }) {
         style={{ color: `var(--${m.accent})` }}
         aria-hidden
       >
-        {m.symbol}
+        {m.symbol}︎
       </div>
       <h3 className="font-display relative mt-3 text-2xl font-bold">{m.signFa}</h3>
       <div className="relative mt-2 flex justify-center">

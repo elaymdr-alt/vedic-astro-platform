@@ -20,7 +20,6 @@ export default function Settings() {
     daily: true,
     weekly: false,
   })
-  const [appearance, setAppearance] = useState("dark")
   const [language, setLanguage] = useState("fa")
 
   const handleSave = (section: string) => {
@@ -153,23 +152,14 @@ export default function Settings() {
             <Card className="vedic-card">
               <CardHeader>
                 <CardTitle>حالت ظاهری</CardTitle>
-                <CardDescription>انتخاب تم رنگی برای برنامه</CardDescription>
+                <CardDescription>برنامه با تم کیهانیِ تاریک نمایش داده می‌شود.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {["dark", "light", "system"].map((theme) => (
-                    <div
-                      key={theme}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                        appearance === theme
-                          ? "border-brand-400 bg-brand-500/15"
-                          : "border-border hover:border-brand-300"
-                      }`}
-                      onClick={() => setAppearance(theme)}
-                    >
-                      <p className="font-medium text-sm capitalize">{theme}</p>
-                    </div>
-                  ))}
+                <div className="rounded-lg border border-primary/40 bg-primary/10 p-4">
+                  <p className="text-sm font-medium">تم کیهانی (فعال)</p>
+                  <p className="text-muted-foreground mt-1 text-xs leading-6">
+                    حالت روشن و خودکار حذف شده‌اند تا همهٔ صفحه‌ها یک‌دست بمانند.
+                  </p>
                 </div>
               </CardContent>
             </Card>

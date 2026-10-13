@@ -166,6 +166,15 @@ def chart_interpret(body: BirthInput) -> dict:
     return {"report": interpret_chart(_build_chart(body))}
 
 
+@app.post("/chart/areas")
+def chart_areas(body: BirthInput) -> dict:
+    """Plain-language, everyday-use reports per life area (work, money, love, …)."""
+    from datetime import date as _d
+    from engine.life_areas import life_area_reports
+    chart = _build_chart(body)
+    return life_area_reports(chart, _d.today(), body.tz_offset)
+
+
 @app.post("/chart/synastry")
 def chart_synastry(body: SynastryInput) -> dict:
     """Compare two natal charts; `a` is the reference (P08-T02)."""

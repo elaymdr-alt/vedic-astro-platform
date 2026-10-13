@@ -7,5 +7,5 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') }
   },
-  server: { port: 5173, proxy: { '/api': { target: 'http://localhost:8000', rewrite: (p) => p.replace(/^\/api/, '') } } },
+  server: { port: 5173, strictPort: true, proxy: { '/api': { target: process.env.API_URL ?? 'http://127.0.0.1:8030', rewrite: (p) => p.replace(/^\/api/, '') } } },
 })

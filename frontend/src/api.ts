@@ -59,16 +59,23 @@ export async function computeChart(payload: Record<string, unknown>): Promise<{ 
   });
   if (!r.ok) {
     const err = await r.json().catch(() => ({}));
-    throw new Error(err?.detail?.message ?? `خطای سرور (${r.status})`);
+    const d = err?.detail;
+    // FastAPI validation errors arrive as a list of {loc, msg}
+    const msg = d?.message ?? (typeof d === 'string' ? d : Array.isArray(d) ? 'مقادیر واردشده معتبر نیستند؛ تاریخ، ساعت و شهر را دوباره بررسی کنید.' : '');
+    throw new Error(msg || `خطای سرور (${r.status})`);
   }
   return r.json();
+}
+
+export async function lifeAreas(payload: Record<string, unknown>) {
+  return post<import('./components/reading/area-reports').LifeAreasReport>('/chart/areas', payload);
 }
 
 export async function searchCities(q: string) {
   const r = await fetch(`${API}/cities?q=${encodeURIComponent(q)}`);
   if (!r.ok) throw new Error('خطا در جست‌وجوی شهر');
   const j = await r.json();
-  return j.items as { name_fa: string; name_en: string; lat: number; lon: number; tz_offset: number; tz?: string }[];
+  return j.items as { name_fa: string; name_en: string; country?: string; lat: number; lon: number; tz_offset: number; tz?: string }[];
 }
 
 /* ------------------------------------------------------------ rectification */

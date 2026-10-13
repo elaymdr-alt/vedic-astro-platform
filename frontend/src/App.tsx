@@ -42,6 +42,7 @@ function HomePage() {
         hour: b.hour,
         minute: b.minute,
         tz_offset: b.tz_offset,
+        time_precision: b.timeKnown === false ? 'unknown' : 'exact',
         tz: b.tz,
         lat: b.lat,
         lon: b.lon,
@@ -73,7 +74,7 @@ function HomePage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-8">
         <div className="space-y-4">
-          <BirthForm onSubmit={submit} loading={loading} />
+          <BirthForm onSubmit={submit} loading={loading} allowUnknownTime />
 
           {error && (
             <div

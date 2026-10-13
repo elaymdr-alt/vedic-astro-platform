@@ -113,6 +113,7 @@ export default function Chat() {
           birth: birth ? {
             calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day, hour: birth.hour,
             minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, lat: birth.lat, lon: birth.lon,
+            time_precision: birth.timeKnown === false ? 'unknown' : 'exact',
           } : undefined,
         }),
       })

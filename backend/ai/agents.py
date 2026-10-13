@@ -28,7 +28,10 @@ from .positivity import StreamGuard, sanitize
 from .safety import CRISIS_REPLY, is_crisis
 from .textutil import normalize
 
-MAX_HISTORY = 10
+MAX_HISTORY = 6          # cost: fewer past turns are re-sent every time
+MAX_MSG_CHARS = 700       # cost: long old messages are clipped
+RAG_K = 3
+RAG_CHARS = 600
 
 ASTRO_WORDS = [
     "طالع", "لگنا", "چارت", "نمودار تولد", "سیاره", "دشا", "داشا", "ترانزیت", "گوچارا", "برج",
@@ -159,7 +162,7 @@ def astro_brief(natal: dict[str, Any], day: date, tz_offset: float, lat: float, 
     return "\n".join(lines)
 
 
-def _format_hits(prefix: str, hits: list[rag.Hit], limit_chars: int = 900) -> tuple[str, list[dict]]:
+def _format_hits(prefix: str, hits: list[rag.Hit], limit_chars: int = RAG_CHARS) -> tuple[str, list[dict]]:
     blocks, sources = [], []
     for i, h in enumerate(hits, 1):
         ref = f"{prefix}{i}"
@@ -182,7 +185,7 @@ def retrieval_query(messages: list[dict[str, str]]) -> str:
     return " ".join(users[-2:])
 
 
-REPORT_CTX_MAX_CHARS = 6000
+REPORT_CTX_MAX_CHARS = 1500
 
 
 def reports_context(reports: list[dict[str, str]] | None) -> str:
@@ -235,7 +238,7 @@ COMPOSER_SYSTEM = f"""تو مدیر گفت‌وگوی AstroBinesh هستی. دو
 
 
 def _history(messages: list[dict[str, str]]) -> list[dict[str, str]]:
-    return [{"role": m["role"], "content": m["content"]} for m in messages[-MAX_HISTORY:]]
+    return [{"role": m["role"], "content": m["content"][:MAX_MSG_CHARS]} for m in messages[-MAX_HISTORY:]]
 
 
 def _agent_messages(system: str, context: str, messages: list[dict[str, str]], style: str = "heart") -> list[dict]:
@@ -258,6 +261,9 @@ def prepare(turn: Turn) -> Prepared:
     if is_crisis(last):
         return Prepared("comfort", [], [], {}, crisis=True)
     agents = route(turn.mode, last, turn.natal is not None)
+    # cost: 'auto' answers with ONE agent (2 agents + composer = 3 LLM calls); 'both' stays explicit
+    if turn.mode == "auto" and len(agents) > 1:
+        agents = agents[:1]
     style = turn.style if turn.style in STYLE_PROMPTS else detect_style(last)
     q = retrieval_query(turn.messages)
     rctx = reports_context(turn.reports)
@@ -265,7 +271,7 @@ def prepare(turn: Turn) -> Prepared:
     prompts: dict[str, list[dict]] = {}
 
     if "astro" in agents:
-        hits = rag.books_kb().search(q, k=5)
+        hits = rag.books_kb().search(q, k=RAG_K)
         text, src = _format_hits("A", hits)
         sources += src
         chart = (_with_strengths(turn, astro_brief(turn.natal, turn.today, turn.tz_offset, turn.lat, turn.lon))
@@ -274,7 +280,7 @@ def prepare(turn: Turn) -> Prepared:
         prompts["astro"] = _agent_messages(ASTRO_SYSTEM, ctx, turn.messages, style)
 
     if "jung" in agents:
-        hits = rag.jung_kb().search(q, k=5)
+        hits = rag.jung_kb().search(q, k=RAG_K)
         text, src = _format_hits("J", hits)
         sources += src
         psy = ""
@@ -291,7 +297,7 @@ def prepare(turn: Turn) -> Prepared:
 
 
 async def _notes(system_name: str, msgs: list[dict]) -> str:
-    return await openrouter.complete(msgs, temperature=0.5, max_tokens=700)
+    return await openrouter.complete(msgs, temperature=0.5, max_tokens=450)
 
 
 def _composer_messages(turn: Turn, notes: dict[str, str], style: str = "heart") -> list[dict]:
@@ -309,11 +315,11 @@ async def run(turn: Turn) -> dict[str, Any]:
         return {"text": CRISIS_REPLY, "crisis": True, "agents": [], "sources": [], "style": "comfort",
                 "style_label": STYLE_LABELS["comfort"]}
     if len(p.agents) == 1:
-        text = await openrouter.complete(p.messages[p.agents[0]], temperature=0.6, max_tokens=1100)
+        text = await openrouter.complete(p.messages[p.agents[0]], temperature=0.6, max_tokens=700)
     else:
         results = await asyncio.gather(*[_notes(a, p.messages[a]) for a in p.agents])
         notes = dict(zip(p.agents, results))
-        text = await openrouter.complete(_composer_messages(turn, notes, p.style), temperature=0.6, max_tokens=1300)
+        text = await openrouter.complete(_composer_messages(turn, notes, p.style), temperature=0.6, max_tokens=800)
     text, _dropped = sanitize(text)
     return {"text": text, "crisis": False, "agents": p.agents, "sources": p.sources, "style": p.style,
             "style_label": STYLE_LABELS[p.style]}
@@ -336,7 +342,7 @@ async def run_stream(turn: Turn) -> AsyncIterator[dict[str, Any]]:
         results = await asyncio.gather(*[_notes(a, p.messages[a]) for a in p.agents])
         msgs = _composer_messages(turn, dict(zip(p.agents, results)), p.style)
     guard = StreamGuard()
-    async for chunk in openrouter.stream(msgs, temperature=0.6, max_tokens=1300):
+    async for chunk in openrouter.stream(msgs, temperature=0.6, max_tokens=800):
         safe = guard.feed(chunk)
         if safe:
             yield {"event": "delta", "text": safe}

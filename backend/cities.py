@@ -37,8 +37,29 @@ def _offset_now(tz: str) -> float:
         return 0.0
 
 
-def _view(r: dict) -> dict:
-    return {"name_fa": r["f"][0] if r["f"] else r["n"], "name_en": r["n"], "country": r["c"],
+_FIX = str.maketrans({"ي": "ی", "ك": "ک", "أ": "ا", "إ": "ا", "ٱ": "ا", "ة": "ه", "ۀ": "ه"})
+_PERSIAN = set("اآبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیئءؤ ‌")
+
+
+def _display_fa(r: dict, nq: str = "") -> str:
+    """GeoNames lists Arabic/Urdu/Kurdish variants in no useful order, so pick the
+    shortest clean Persian spelling (preferring one the user actually typed)."""
+    clean = []
+    for raw in r["f"]:
+        t = raw.translate(_FIX).strip()
+        if t and all(ch in _PERSIAN for ch in t):
+            clean.append(t)
+    if not clean:
+        return r["f"][0] if r["f"] else r["n"]
+    if nq:
+        hit = [t for t in clean if normalize(t).startswith(nq)]
+        if hit:
+            clean = hit
+    return min(clean, key=len)  # stable: ties keep GeoNames order
+
+
+def _view(r: dict, nq: str = "") -> dict:
+    return {"name_fa": _display_fa(r, nq), "name_en": r["n"], "country": r["c"],
             "lat": r["lat"], "lon": r["lon"], "tz": r["tz"], "tz_offset": _offset_now(r["tz"]),
             "population": r["p"]}
 
@@ -64,4 +85,4 @@ def search_cities(q: str, limit: int = 8) -> list[dict]:
         if best:
             scored.append((best * 1e9 + r["p"] + (5e7 if r["c"] == "IR" else 0), r))
     scored.sort(key=lambda x: -x[0])
-    return [_view(r) for _, r in scored[:limit]]
+    return [_view(r, nq) for _, r in scored[:limit]]

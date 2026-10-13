@@ -67,7 +67,7 @@ export default function Psyche() {
     api<Profile>('/psyche/profile', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ calendar: 'jalali', year: birth.year, month: birth.month, day: birth.day,
-        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, lat: birth.lat, lon: birth.lon }),
+        hour: birth.hour, minute: birth.minute, tz: birth.tz, tz_offset: birth.tz_offset, time_precision: birth.timeKnown === false ? 'unknown' : 'exact', lat: birth.lat, lon: birth.lon }),
     }).then(setProfile).catch((e) => setErr(e.message)).finally(() => setLoading(false))
   }, [birth])
 

@@ -623,7 +623,7 @@ export function buildReading(chart: NatalChart): ReadingDoc {
   const moonBhava = getBhava(moonP.house)
 
   const hero = {
-    lede: `آسمانِ لحظه‌ی تولد ${name} سه دروازه دارد: لگنای ${lagna.fa} که چهره‌ی بیرونی و سبکِ ورودت به دنیاست، ماهِ ${moonRashi.fa} که احساس و آرامش درونی‌ات را می‌چرخاند، و خورشیدِ ${sunRashi.fa} که هسته‌ی اراده‌ی توست. در این صفحه هر سه را قدم‌به‌قدم، بدون اصطلاحات فنی و به زبان خودمان می‌خوانیم.`,
+    lede: `آسمانِ لحظه‌ی تولد ${name} سه دروازه دارد: ${chart.profile.timeKnown === false ? `چون ساعت تولد نامعلوم است، ماهِ ${lagna.fa} را به‌جای لگنا می‌گیریم؛ نقطه‌ی ورودت به دنیا` : `لگنای ${lagna.fa} که چهره‌ی بیرونی و سبکِ ورودت به دنیاست`}، ماهِ ${moonRashi.fa} که احساس و آرامش درونی‌ات را می‌چرخاند، و خورشیدِ ${sunRashi.fa} که هسته‌ی اراده‌ی توست. در این صفحه هر سه را قدم‌به‌قدم، بدون اصطلاحات فنی و به زبان خودمان می‌خوانیم.`,
     medallions: [
       medallionOf("lagna", "لگنا", "چهره‌ی بیرونی", chart.lagna, lagna.keyword, LAGNA_ESSENCE[chart.lagna]),
       medallionOf("moon", "ماه", "جهان درون", moonP.sign, moonRashi.keyword, MOON_NEED[moonP.sign]),

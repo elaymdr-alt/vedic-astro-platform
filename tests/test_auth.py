@@ -29,6 +29,8 @@ def client():
     app.dependency_overrides[database.get_db] = override
     yield TestClient(app)
     app.dependency_overrides.clear()
+    from backend import routes
+    routes._hits.clear()
 
 
 def signup(c, name):
@@ -80,3 +82,10 @@ def test_login_with_email_or_username(client):
     signup(client, "ali")
     by_email = client.post("/auth/token", data={"username": "ali@x.io", "password": "s3cretpass"})
     assert by_email.status_code == 200 and by_email.json()["access_token"]
+
+def test_rate_limit(client):
+    # Register many times
+    for _ in range(20):
+        client.post("/auth/register", json={"username": f"u{_}", "email": f"u{_}@test.com", "password": "password123"})
+    assert client.post("/auth/register", json={"username": "extra", "email": "e@test.com", "password": "password123"}).status_code == 429
+

@@ -1,7 +1,8 @@
 """Auth + birth-profile routes (P07-T01/T02). Ownership is enforced per request."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+import time
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -12,11 +13,38 @@ from backend.database import get_db
 from backend.models import BirthProfile, User
 from backend.schemas import ProfileIn, ProfileOut, TokenOut, UserCreate, UserOut
 
+_RATE_WINDOW, _RATE_MAX = 60.0, 5
+_hits: dict[str, list[float]] = {}
+
+
+def _limited(key: str) -> bool:
+    now = time.monotonic()
+    hits = [t for t in _hits.get(key, []) if now - t < _RATE_WINDOW]
+    if len(hits) >= _RATE_MAX:
+        _hits[key] = hits
+        return True
+    hits.append(now)
+    _hits[key] = hits
+    if len(_hits) > 5000:
+        _hits.clear()
+    return False
+
+
+def _guard(request: Request) -> None:
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else "local"))
+    if _limited(ip):
+        raise HTTPException(status_code=429, detail={
+            "code": "RATE_LIMITED", "message": "تعداد درخواست‌ها زیاد است؛ یک دقیقه بعد دوباره تلاش کنید."})
+
+
+
 router = APIRouter()
 
 
 @router.post("/auth/register", response_model=UserOut, status_code=201, tags=["auth"])
-def register(body: UserCreate, db: Session = Depends(get_db)):
+def register(body: UserCreate, request: Request, db: Session = Depends(get_db)):
+    _guard(request)
     try:
         return crud.create_user(db, body.username, body.email, body.password)
     except IntegrityError:
@@ -25,7 +53,8 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/token", response_model=TokenOut, tags=["auth"])
-def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(request: Request, form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    _guard(request)
     user = crud.authenticate_user(db, form.username, form.password)
     if user is None or not user.is_active:
         raise HTTPException(

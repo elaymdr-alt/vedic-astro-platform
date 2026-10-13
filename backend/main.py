@@ -1,6 +1,7 @@
 """FastAPI backend — health, cities, calendar, chart, time, synastry, transits (P05 + P07 + P08)."""
 from __future__ import annotations
 
+import os
 import sys
 from contextlib import asynccontextmanager
 from datetime import timezone
@@ -43,9 +44,10 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="AstroBinesh API", version="0.1.0", lifespan=lifespan)
 
+origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

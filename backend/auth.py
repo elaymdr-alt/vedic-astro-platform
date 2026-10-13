@@ -15,8 +15,14 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import BirthProfile, ProfileShare, User
 
+import logging
+
+# ...
+
 # Set JWT_SECRET_KEY in production. Without it a random per-process key is used
 # (safe, but every restart invalidates existing tokens).
+if not os.environ.get("JWT_SECRET_KEY"):
+    logging.warning("JWT_SECRET_KEY is not set. Random key used; tokens will be invalid after restart.")
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or secrets.token_urlsafe(48)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours

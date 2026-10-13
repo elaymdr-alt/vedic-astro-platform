@@ -40,6 +40,10 @@ astrobinesh/
 ## Ejra-ye sari (Quickstart)
 
 ```powershell
+# Set Environment Variables (Example)
+# $env:CORS_ORIGINS="http://localhost:5173,https://astro.example.com"
+# $env:JWT_SECRET_KEY="your-very-secure-random-key"
+
 # 1) Nasb-e vabastegi-haye Python
 python -m pip install -r backend/requirements.txt
 

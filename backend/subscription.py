@@ -12,3 +12,7 @@ def get_report_limit(user: User) -> int:
 def can_generate_report(user: User, current_count: int) -> bool:
     """Checks if user has reached their daily limit."""
     return current_count < get_report_limit(user)
+def upgrade_to_pro(user: User, db: Session):
+    user.subscription_status = "pro"
+    db.commit()
+

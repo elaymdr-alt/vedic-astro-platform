@@ -29,6 +29,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     role = Column(String(30), default="user")  # user | admin | astrologer
+    subscription_status = Column(String(30), default="free")  # free | pro | lifetime
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 

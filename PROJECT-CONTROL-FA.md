@@ -32,7 +32,7 @@
 | ۳ | ۲۰۲۶/۱۰/۱۳ | DOCS | سه فایل کنترلی: اجرایی، کنترل پروژه، پرامپت جامع کلاین | EXECUTION-PLAN-FA.md، PROJECT-CONTROL-FA.md، CLINE-MASTER-PROMPT-FA.md | — | ✅ انجام شد | 554cf3e | موج ۰ تا ۴ در فایل اجرایی |
 
 | 4 | ۲۰۲۶/۱۰/۱۳ | M0-1 | امنیت: CORS از env و هشدار JWT_SECRET_KEY | backend/main.py, backend/auth.py, README.md | 12 pass | ✅ انجام شد | 7dd2f07 | — |
-| 5 | ۲۰۲۶/۱۰/۱۳ | M0-2 | ریت‌لیمیت: افزودن محدودیت برای ورود/ثبت‌نام | backend/routes.py, tests/test_auth.py | 6 pass | ✅ انجام شد | 0000000 | در حال جایگذاری هش |
+| 5 | ۲۰۲۶/۱۰/۱۳ | M0-2 | ریت‌لیمیت: افزودن محدودیت برای ورود/ثبت‌نام | backend/routes.py, tests/test_auth.py | 6 pass | ✅ انجام شد | 1ef0507 | — |
 
 
 <!-- ردیف‌های جدید را از همین خط پایین اضافه کن -->

@@ -14,9 +14,9 @@ interface ReportRow {
   error: string | null
   created_at: string | null
   completed_at: string | null
+  generated_at?: string
   result?: {
     profile?: { name?: string }
-    generated_at?: string
     interpretation?: {
       paragraphs?: { rule_id: string; topic: string; text_fa: string; rules_version: string; evidence?: unknown }[]
       limitations?: { code: string; message: string }[]
@@ -117,6 +117,16 @@ export default function ReportsPanel({ profileId, label }: { profileId: number; 
       if (alive.current) setBusy(null)
     }
   }
+  const remove = useCallback(async (id: number) => {
+    setBusy(id); setErr('')
+    const r = await authFetch(`/reports/${id}`, { method: 'DELETE' })
+    if (alive.current) {
+      if (r.ok || r.status === 204) setRows((cur) => cur.filter((x) => x.id !== id))
+      else setErr(await readError(r))
+      setBusy(null)
+    }
+  }, [profileId, alive])
+
 
   const shareLink = async (id: number) => {
     setBusy(id); setErr(''); setShare('')
@@ -208,11 +218,4 @@ export default function ReportsPanel({ profileId, label }: { profileId: number; 
   )
 }
 
-    setBusy(id); setErr('')
-    const r = await authFetch(`/reports/${id}`, { method: 'DELETE' })
-    if (alive.current) {
-      if (r.ok || r.status === 204) setRows((cur) => cur.filter((x) => x.id !== id))
-      else setErr(await readError(r))
-      setBusy(null)
-    }
-  }
+

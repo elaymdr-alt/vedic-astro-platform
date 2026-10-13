@@ -62,8 +62,8 @@ export default function Landing() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {[
             { name: "رایگان", price: "0", desc: "مناسب برای شروع", features: ["1 چارت رایگان", "داشا پایه", "ترجمه روزانه"], cta: "شروع", popular: false },
-            { name: "استاندارد", price: "29", desc: "برای عاشقان نجوم", features: ["چارت‌های نامحدود", "تحلیل کامل داشا", "سازگاری زوجین", "پشتیبانی"], cta: "شروع", popular: true },
-            { name: "حرفه‌ای", price: "79", desc: "برای حرفه‌ای‌ها", features: ["همه امکانات استاندارد", "ترانزیت بلادرنگ", "تحلیل تخصصی", "مشاوره تلفنی"], cta: "تماس بگیرید", popular: false },
+            { name: "استاندارد", price: "29", desc: "برای عاشقان نجوم", features: ["چارت‌های نامحدود", "تحلیل کامل داشا", "سازگاری زوجین", "پشتیبانی"], cta: "به‌زودی", popular: true },
+            { name: "حرفه‌ای", price: "79", desc: "برای حرفه‌ای‌ها", features: ["همه امکانات استاندارد", "ترانزیت بلادرنگ", "تحلیل تخصصی", "مشاوره تلفنی"], cta: "به‌زودی", popular: false },
           ].map((p) => (
             <Card key={p.name} className={`vedic-card ${p.popular ? 'ring-2 ring-brand-500' : ''} relative`}>
               {p.popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600">پرطرفدار</Badge>}
